@@ -1,4 +1,6 @@
-﻿Messager messager = new();
+﻿using System.Globalization;
+
+Messager messager = new();
 while (true)
 {
     Console.Clear();
@@ -16,6 +18,7 @@ while (true)
             NewGroup();
             break;
         case "3":
+            ViewChat(ChooseChat());
             break;
     }
 }
@@ -44,6 +47,61 @@ void NewGroup()
     if (userInput == null) Console.WriteLine();
 }
 
+Chat ChooseChat()
+{
+    Console.Clear();
+    Console.Write("Напишите имя чата для поиска:");
+
+    List<Chat> chats = messager.GetChats(Console.ReadLine());
+    chats.ForEach(chat => Console.WriteLine(chat.ChatName));
+
+    Console.CursorVisible = false;
+    (int left, int top) = (Console.CursorLeft, Console.CursorTop);
+    int selectIndex = 0;
+
+    while (true)
+    {
+        Console.BackgroundColor = ConsoleColor.White;
+        Console.ForegroundColor = ConsoleColor.Black;
+
+        Console.SetCursorPosition(0, top - chats.Count + selectIndex);
+        Console.Write(chats[selectIndex].ChatName);
+
+        Console.ResetColor();
+
+        switch (Console.ReadKey(true).Key)
+        {
+            case ConsoleKey.UpArrow:
+                if (selectIndex > 0)
+                {
+                    Console.SetCursorPosition(0, Console.CursorTop);
+                    Console.Write(chats[selectIndex].ChatName);
+                    selectIndex--;
+                }
+                break;
+
+            case ConsoleKey.DownArrow:
+                if (selectIndex < chats.Count - 1)
+                {
+                    Console.SetCursorPosition(0, Console.CursorTop);
+                    Console.Write(chats[selectIndex].ChatName);
+                    selectIndex++;
+                }
+                break;
+
+            case ConsoleKey.Spacebar:
+            case ConsoleKey.Enter:
+                Console.SetCursorPosition(left, top);
+                Console.CursorVisible = false;
+                return chats[selectIndex];
+        }
+    }
+}
+
+void ViewChat(Chat chat)
+{
+
+}
 
 
 public class Messager
@@ -87,7 +145,7 @@ public class Messager
 
         for (int i = 0; i < members.Length; i++)
         {
-            membersList.Add(members[i].Trim());
+            if (!members[i].IsWhiteSpace()) membersList.Add(members[i].Trim());
         }
 
         if (groupName.IsWhiteSpace()) 
@@ -110,12 +168,24 @@ public class Messager
 
         Chats.Add(new(groupName) { Members = membersList });
     }
+
+    public List<Chat> GetChats(string? chatName)
+    {
+        if (string.IsNullOrWhiteSpace(chatName))
+        {
+            return Chats;
+        }
+
+        List<Chat> chats = Chats.Where(x => x.ChatName.ToLower().Contains(chatName.Trim().ToLower())).ToList();
+        return chats;
+    }
 }
 
 public class Chat(string chatName)
 {
     public string ChatName = chatName;
     public List<string> Members = [];
+    public List<Message> Messages = [];
 }
 
 public class Message(string sender, string text, string type = "text")
