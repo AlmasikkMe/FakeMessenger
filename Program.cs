@@ -113,6 +113,43 @@ void ViewChatHistory(Chat chat)
     });
 }
 
+void WriteMessage(Chat chat)
+{
+    string? text = null;
+    while (string.IsNullOrWhiteSpace(text))
+    {
+        Console.Write("Введите сообщение: ");
+        text = Console.ReadLine();
+    }
+    text = text.Trim();
+
+    string? sender;
+    while (true)
+    {
+        Console.Write("Введите отправителя: ");
+        sender = Console.ReadLine();
+        sender ??= "";
+        sender = sender.Trim();
+        if (chat.Members.Contains(sender)) break;
+        else Console.WriteLine($"Участники данного чата: {string.Join(", ", chat.Members)}");
+    }
+      
+    string? type;
+    while (true)
+    {
+        Console.Write("Введите отправителя: ");
+        type = Console.ReadLine();
+        type ??= "";
+        type = type.Trim();
+        if (Messager.MessagesTypes.Keys.Contains(type)) break;
+        else Console.WriteLine($"Участники данного чата: {string.Join(", ", Messager.MessagesTypes.Keys)}");
+    }
+
+    Message message = new(sender, text, type);
+    DateTime.TryParse(Console.ReadLine(), out message.DateTime);
+
+    chat.Messages.Add(message);
+}
 
 public class Messager
 {
@@ -203,5 +240,5 @@ public class Message(string sender, string text, string type = "text")
     public string Sender = sender;
     public string Text = text;
     public string Type = type;
-    public DateTime DateTime;
+    public DateTime DateTime = DateTime.Now;
 }
