@@ -18,7 +18,7 @@ while (true)
             NewGroup();
             break;
         case "3":
-            ViewChat(ChooseChat());
+            ViewChatHistory(ChooseChat());
             break;
     }
 }
@@ -98,9 +98,19 @@ Chat ChooseChat()
     }
 }
 
-void ViewChat(Chat chat)
+void ViewChatHistory(Chat chat)
 {
-
+    chat.Messages.ForEach(message => 
+    {
+        Console.WriteLine($"{message.Sender}, {message.DateTime:dd.MM.yyyy HH:mm}");
+        if (message.Type != "text")
+        {
+            Console.Write($"[{Messager.MessagesTypes[message.Type].Emoji} ");
+            if (message.Text == string.Empty) Console.WriteLine($"{Messager.MessagesTypes[message.Type].Name}]");
+            else Console.WriteLine($"{message.Text}]");
+        }
+        Console.WriteLine(message.Text);
+    });
 }
 
 
