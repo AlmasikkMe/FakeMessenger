@@ -1,10 +1,11 @@
 ﻿using System.Globalization;
 
-Messager messager = new();
+Messenger messenger = new();
 while (true)
 {
     Console.Clear();
     Console.WriteLine("Что вы хотите сделать?");
+
     Console.WriteLine("1. Создать контакт");
     Console.WriteLine("2. Создать группу");
     Console.WriteLine("3. Перейти в чат");
@@ -28,7 +29,7 @@ void NewContact()
     Console.Write("Введите имя для контакта: ");
     string? contact = Console.ReadLine();
     if (contact == null) Console.WriteLine();
-    messager.NewContact(contact ?? "");
+    messenger.NewContact(contact ?? "");
 }
 
 void NewGroup()
@@ -52,7 +53,7 @@ Chat ChooseChat()
     Console.Clear();
     Console.Write("Напишите имя чата для поиска:");
 
-    List<Chat> chats = messager.GetChats(Console.ReadLine());
+    List<Chat> chats = messenger.GetChats(Console.ReadLine());
     chats.ForEach(chat => Console.WriteLine(chat.ChatName));
 
     Console.CursorVisible = false;
@@ -105,15 +106,15 @@ void ViewChatHistory(Chat chat)
         Console.WriteLine($"{message.Sender}, {message.DateTime:dd.MM.yyyy HH:mm}");
         if (message.Type != "text")
         {
-            Console.Write($"[{Messager.MessagesTypes[message.Type].Emoji} ");
-            if (message.Text == string.Empty) Console.WriteLine($"{Messager.MessagesTypes[message.Type].Name}]");
+            Console.Write($"[{Messenger.MessagesTypes[message.Type].Emoji} ");
+            if (message.Text == string.Empty) Console.WriteLine($"{Messenger.MessagesTypes[message.Type].Name}]");
             else Console.WriteLine($"{message.Text}]");
         }
         Console.WriteLine(message.Text);
     });
 }
 
-void WriteMessage(Chat chat)
+void SendMessage(Chat chat)
 {
     string? text = null;
     while (string.IsNullOrWhiteSpace(text))
@@ -141,8 +142,8 @@ void WriteMessage(Chat chat)
         type = Console.ReadLine();
         type ??= "";
         type = type.Trim();
-        if (Messager.MessagesTypes.Keys.Contains(type)) break;
-        else Console.WriteLine($"Участники данного чата: {string.Join(", ", Messager.MessagesTypes.Keys)}");
+        if (Messenger.MessagesTypes.Keys.Contains(type)) break;
+        else Console.WriteLine($"Участники данного чата: {string.Join(", ", Messenger.MessagesTypes.Keys)}");
     }
 
     Message message = new(sender, text, type);
@@ -179,6 +180,7 @@ void ChatCommandMenu(Chat chat)
     }
 }
 
+public class Messenger
 {
     public static Dictionary<string, (string Emoji, string Name, bool IsWithTime)> MessagesTypes = new()
     {
