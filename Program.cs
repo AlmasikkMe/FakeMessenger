@@ -141,15 +141,17 @@ void SendMessage(Chat chat)
     string? type;
     while (true)
     {
-        Console.Write("Введите отправителя: ");
+        Console.Write("Введите тип сообщения: ");
         type = Console.ReadLine();
         type ??= "";
         type = type.Trim();
-        if (Messenger.MessagesTypes.Keys.Contains(type)) break;
-        else Console.WriteLine($"Участники данного чата: {string.Join(", ", Messenger.MessagesTypes.Keys)}");
+        if (Messenger.MessagesTypes.Keys.Contains(type) || type == "text") break;
+        else Console.WriteLine($"Доступные типы: {string.Join(", ", Messenger.MessagesTypes.Keys)}");
     }
 
     Message message = new(sender, text, type);
+
+    Console.Write("Введите время сообщения: ");
     DateTime.TryParse(Console.ReadLine(), out message.DateTime);
 
     chat.Messages.Add(message);
@@ -172,6 +174,7 @@ void ChatCommandMenu(Chat chat)
         {
             case "1":
                 ViewChatHistory(chat);
+                Console.ReadLine();
                 break;
             case "2":
                 SendMessage(chat);
