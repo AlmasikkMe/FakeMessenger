@@ -18,7 +18,7 @@ while (true)
             NewGroup();
             break;
         case "3":
-            ViewChatHistory(ChooseChat());
+            ChatCommandMenu(ChooseChat());
             break;
     }
 }
@@ -151,7 +151,34 @@ void WriteMessage(Chat chat)
     chat.Messages.Add(message);
 }
 
-public class Messager
+void ChatCommandMenu(Chat chat)
+{
+    bool inDialog = true;
+    while (inDialog)
+    {
+        Console.Clear();
+        Console.WriteLine($"Вы в чате {chat.ChatName}");
+        Console.WriteLine("Что вы хотите сделать?");
+
+        Console.WriteLine("1. Посмотреть историю чата");
+        Console.WriteLine("2. Отправить сообщение");
+        Console.WriteLine("0. Выйти из чата");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+                ViewChatHistory(chat);
+                break;
+            case "2":
+                SendMessage(chat);
+                break;
+            case "0":
+                inDialog = false;
+                break;
+        }
+    }
+}
+
 {
     public static Dictionary<string, (string Emoji, string Name, bool IsWithTime)> MessagesTypes = new()
     {
