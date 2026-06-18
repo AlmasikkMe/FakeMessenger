@@ -2,6 +2,29 @@
 using System.Globalization;
 
 Messenger messenger = new();
+
+Dictionary<string, (string Emoji, string Name, bool IsWithTime)> MessagesTypes = new()
+    {
+        { "photo",        ("🖼", "Фотография",          false) },
+        { "video",        ("📹", "Видеозапись",         false) },
+        { "video_note",   ("📹", "Видеосообщение",      true)  },
+        { "gif",          ("💥", "GIF",                 false) },
+        { "voice",        ("🎤", "Голосовое сообщение", true)  },
+        { "audio",        ("🎶", "Аудиозапись",         false) },
+        { "voice_effect", ("🔊", "Голосовой эффект",    false) },
+        { "file",         ("📂", "Файл",                false) },
+        { "sticker",      ("🎨", "Стикер",              false) },
+        { "emoji",        ("🎨", "Эмодзи",              false) },
+        { "poll",         ("📊", "Опрос",               false) },
+        { "quiz",         ("📊", "Викторина",           false) },
+        { "contact",      ("👤", "Контакт",             false) },
+        { "location",     ("📍", "Геолокация",          false) },
+        { "live_location",("🚨", "Живая геолокация",    false) },
+        { "game",         ("🎮", "Игра",                false) },
+        { "product",      ("🛍", "Продукт",             false) },
+        { "gift",         ("🎁", "Подарок",             false) }
+    };
+
 while (true)
 {
     Console.Clear();
@@ -68,8 +91,8 @@ void ViewChatHistory(Chat chat)
         Console.WriteLine($"{message.Sender}, {message.DateTime:dd.MM.yyyy HH:mm}");
         if (message.Type != "text")
         {
-            Console.Write($"[{Messenger.MessagesTypes[message.Type].Emoji} ");
-            if (message.Text == string.Empty) Console.WriteLine($"{Messenger.MessagesTypes[message.Type].Name}]");
+            Console.Write($"[{MessagesTypes[message.Type].Emoji} ");
+            if (message.Text == string.Empty) Console.WriteLine($"{MessagesTypes[message.Type].Name}]");
             else Console.WriteLine($"{message.Text}]");
         }
         Console.WriteLine(message.Text);
@@ -91,7 +114,7 @@ void SendMessage(Chat chat)
     Console.Clear();
 
     Console.Write("Выберите тип сообщения (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
-    string? type = SearchDialog(searchText => Messenger.MessagesTypes.Select(type => type.Key).Prepend("text").ToList());
+    string? type = SearchDialog(searchText => MessagesTypes.Select(type => type.Key).Prepend("text").ToList());
     Console.Clear();
 
     Message message = new(sender, text, type);
