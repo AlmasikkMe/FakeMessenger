@@ -110,7 +110,7 @@ void SendMessage(Chat chat)
     text = text.Trim();
 
     Console.Write("Выберите отправителя (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
-    string? sender = SearchDialog(searchText => chat.Members.Where(member => member.Contains(searchText)).ToList());
+    string? sender = SearchDialog(chat.GetMembers);
     Console.Clear();
 
     Console.Write("Выберите тип сообщения (Нажмите любую кнопку для продолжения): "); Console.ReadKey();

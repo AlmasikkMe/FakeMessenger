@@ -7,7 +7,11 @@
     {
         contactName = contactName.IsWhiteSpace() ? $"Контакт {Contacts.Count + 1}" : contactName.Trim();
         Contacts.Add(contactName);
-        Chats.Add(new(contactName) { Members = [contactName, "Вы"] });
+
+        Chat chat = new(contactName);
+        chat.AddMembers(["Вы", contactName]);
+
+        Chats.Add(chat);
     }
 
     public void NewGroup(string groupName, string[] members)
@@ -28,17 +32,16 @@
             if (membersList.Count > 3) groupName += $" и ещё {membersList.Count - 3}";
         }
 
-        Chats.Add(new(groupName) { Members = membersList });
+        Chat chat = new(groupName);
+        chat.AddMembers(membersList);
+
+        Chats.Add(chat);
     }
-
-    public List<Chat> GetChats(string? chatName = null)
+    public List<Chat> GetChats(string search = "")
     {
-        if (string.IsNullOrWhiteSpace(chatName))
-        {
-            return Chats;
-        }
-
-        List<Chat> chats = Chats.Where(x => x.ChatName.ToLower().Contains(chatName.Trim().ToLower())).ToList();
-        return chats;
+        return (from chat in Chats
+                where chat.ChatName.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
+                select chat)
+                .ToList();
     }
 }
