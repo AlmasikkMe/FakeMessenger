@@ -317,14 +317,14 @@ public class Messenger
     {
         contactName = contactName.IsWhiteSpace() ? $"Контакт {Contacts.Count + 1}" : contactName.Trim();
         Contacts.Add(contactName);
-        Chats.Add(new(contactName) { Members = [contactName] });
+        Chats.Add(new(contactName) { Members = [contactName, "Вы"] });
     }
 
     public void NewGroup(string groupName, string[] members)
     {
         if (members.Length == 0) return;
 
-        List<string> membersList = [];
+        List<string> membersList = ["Вы"];
 
         for (int i = 0; i < members.Length; i++)
         {
@@ -333,20 +333,9 @@ public class Messenger
 
         if (groupName.IsWhiteSpace()) 
         {
-            groupName = "";
+            groupName = string.Join(", ", membersList.Take(3));
 
-            for (int i = 0; i < 5 && i < membersList.Count; i++)
-            {
-                if (i == 4)
-                {
-                    groupName += $"еще {membersList.Count - i + 1}";
-                    break;
-                }
-
-                groupName += membersList[i];
-
-                if (i >= membersList.Count - 1) groupName += ", ";
-            }
+            if (membersList.Count > 3) groupName += $" и ещё {membersList.Count - 3}";
         }
 
         Chats.Add(new(groupName) { Members = membersList });
