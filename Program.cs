@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 Messenger messenger = new();
 while (true)
@@ -56,53 +57,8 @@ void NewGroup()
 
 Chat ChooseChat()
 {
-    Console.Clear();
-    Console.Write("Напишите имя чата для поиска:");
-
-    List<Chat> chats = messenger.GetChats(Console.ReadLine());
-    chats.ForEach(chat => Console.WriteLine(chat.ChatName));
-
-    Console.CursorVisible = false;
-    (int left, int top) = (Console.CursorLeft, Console.CursorTop);
-    int selectIndex = 0;
-
-    while (true)
-    {
-        Console.BackgroundColor = ConsoleColor.White;
-        Console.ForegroundColor = ConsoleColor.Black;
-
-        Console.SetCursorPosition(0, top - chats.Count + selectIndex);
-        Console.Write(chats[selectIndex].ChatName);
-
-        Console.ResetColor();
-
-        switch (Console.ReadKey(true).Key)
-        {
-            case ConsoleKey.UpArrow:
-                if (selectIndex > 0)
-                {
-                    Console.SetCursorPosition(0, Console.CursorTop);
-                    Console.Write(chats[selectIndex].ChatName);
-                    selectIndex--;
-                }
-                break;
-
-            case ConsoleKey.DownArrow:
-                if (selectIndex < chats.Count - 1)
-                {
-                    Console.SetCursorPosition(0, Console.CursorTop);
-                    Console.Write(chats[selectIndex].ChatName);
-                    selectIndex++;
-                }
-                break;
-
-            case ConsoleKey.Spacebar:
-            case ConsoleKey.Enter:
-                Console.SetCursorPosition(left, top);
-                Console.CursorVisible = false;
-                return chats[selectIndex];
-        }
-    }
+    string chatName = SearchDialog(searchText => messenger.GetChats(searchText).Select(chat => chat.ChatName).ToList());
+    return messenger.GetChats(chatName)[0];
 }
 
 void ViewChatHistory(Chat chat)
@@ -130,27 +86,13 @@ void SendMessage(Chat chat)
     }
     text = text.Trim();
 
-    string? sender;
-    while (true)
-    {
-        Console.Write("Введите отправителя: ");
-        sender = Console.ReadLine();
-        sender ??= "";
-        sender = sender.Trim();
-        if (chat.Members.Contains(sender)) break;
-        else Console.WriteLine($"Участники данного чата: {string.Join(", ", chat.Members)}");
-    }
-      
-    string? type;
-    while (true)
-    {
-        Console.Write("Введите тип сообщения: ");
-        type = Console.ReadLine();
-        type ??= "";
-        type = type.Trim();
-        if (Messenger.MessagesTypes.Keys.Contains(type) || type == "text") break;
-        else Console.WriteLine($"Доступные типы: {string.Join(", ", Messenger.MessagesTypes.Keys)}");
-    }
+    Console.Write("Выберите отправителя (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
+    string? sender = SearchDialog(searchText => chat.Members.Where(member => member.Contains(searchText)).ToList());
+    Console.Clear();
+
+    Console.Write("Выберите тип сообщения (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
+    string? type = SearchDialog(searchText => Messenger.MessagesTypes.Select(type => type.Key).Prepend("text").ToList());
+    Console.Clear();
 
     Message message = new(sender, text, type);
 
@@ -285,9 +227,9 @@ string SearchDialog(Func<string, List<string>> optionsUpdate)
                 else
                 {
                     return options[selectIndex];
+                }
         }
     }
-}
 }
 
 public class Messenger
@@ -344,7 +286,7 @@ public class Messenger
         Chats.Add(new(groupName) { Members = membersList });
     }
 
-    public List<Chat> GetChats(string? chatName)
+    public List<Chat> GetChats(string? chatName = null)
     {
         if (string.IsNullOrWhiteSpace(chatName))
         {
