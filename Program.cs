@@ -186,6 +186,107 @@ void ChatCommandMenu(Chat chat)
     }
 }
 
+string SearchDialog(Func<string, List<string>> optionsUpdate)
+{
+    Console.Clear();
+
+    Console.CursorVisible = false;
+    int selectIndex = -1;
+    int offset = 0;
+
+    Console.WriteLine("Напишите для поиска: ");
+    string searchText = "";
+
+    List<string> options = optionsUpdate(searchText);
+    options.Take(Console.WindowHeight - 2)
+        .ToList()
+        .ForEach(option => Console.WriteLine(option));
+
+    while (true)
+    {
+        Console.SetCursorPosition(0, selectIndex - offset + 1);
+
+        Console.BackgroundColor = ConsoleColor.White;
+        Console.ForegroundColor = ConsoleColor.Black;
+
+        if (selectIndex != -1) Console.Write(options[selectIndex]);
+        else Console.Write("Напишите для поиска: ");
+
+        Console.ResetColor();
+
+        ConsoleKeyInfo consoleKey = Console.ReadKey(true);
+
+        switch (consoleKey.Key)
+        {
+            case ConsoleKey.UpArrow:
+                if (selectIndex > -1)
+                {
+                    Console.SetCursorPosition(0, Console.CursorTop);
+                    Console.Write(options[selectIndex]);
+                    selectIndex--;
+
+                    if (offset > 0)
+                    {
+                        offset--;
+
+                        Console.Clear();
+                        Console.WriteLine("Напишите для поиска: ");
+                        options.Skip(offset)
+                            .Take(Console.WindowHeight - 2)
+                            .ToList()
+                            .ForEach(option => Console.WriteLine(option));
+                    }
+                }
+                break;
+
+            case ConsoleKey.DownArrow:
+                if (selectIndex < options.Count - 1)
+                {
+                    Console.SetCursorPosition(0, Console.CursorTop);
+                    if (selectIndex != -1) Console.Write(options[selectIndex]);
+                    else Console.Write("Напишите для поиска: ");
+
+                    selectIndex++;
+                    if (selectIndex - offset + 1 >= Console.WindowHeight - 1)
+                    {
+                        offset++;
+
+                        Console.Clear();
+                        Console.WriteLine("Напишите для поиска: ");
+                        options.Skip(offset)
+                            .Take(Console.WindowHeight - 2)
+                            .ToList()
+                            .ForEach(option => Console.WriteLine(option));
+                    }
+                }
+                break;
+
+            case ConsoleKey.Spacebar:
+            case ConsoleKey.Enter:
+                Console.CursorVisible = true;
+                if (selectIndex == -1)
+                {
+                    Console.Clear();
+                    Console.Write("Напишите для поиска: ");
+
+                    string? input = Console.ReadLine();
+                    if (input == null) Console.WriteLine();
+                    searchText = input ?? "";
+
+                    options = optionsUpdate(searchText);
+                    options.ForEach(option => Console.WriteLine(option));
+
+                    Console.CursorVisible = false;
+                    break;
+                }
+                else
+                {
+                    return options[selectIndex];
+        }
+    }
+}
+}
+
 public class Messenger
 {
     public static Dictionary<string, (string Emoji, string Name, bool IsWithTime)> MessagesTypes = new()
