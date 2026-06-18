@@ -45,10 +45,13 @@ void NewGroup()
     {
         members = userInput.Split(",");
     }
+    else return;
 
     Console.Write("Введите имя для группы: ");
     userInput = Console.ReadLine();
-    if (userInput == null) Console.WriteLine();
+    userInput ??= "";
+
+    messenger.NewGroup(userInput, members);
 }
 
 Chat ChooseChat()
