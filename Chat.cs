@@ -6,13 +6,10 @@ public class Chat(string chatName)
 
     public string ChatName = chatName;
     private List<string> _members = [];
-    public List<Message> Messages = [];
+    private List<Message> _messages = [];
 
-    [XmlArray("Members")] [XmlArrayItem("Member")]  public List<string> Members
-    {
-        get => _members;
-        set => _members = value ?? [];
-    }
+    [XmlArray("Members")] [XmlArrayItem("Member")]  public List<string> Members { get => _members; }
+    [XmlArray("Messages")] [XmlArrayItem("Message")]  public List<Message> Messages { get => _messages; }
 
     public List<string> GetMembers(string search = "")
     {
@@ -36,6 +33,10 @@ public class Chat(string chatName)
         if (type != null) message.Type = type;
         if (dateTime != null) message.DateTime = (DateTime)dateTime;
 
-        Messages.Add(message);
+        _messages.Add(message);
+        _messages = (from m in _messages
+                    orderby m.DateTime
+                    select m)
+                    .ToList();
     }
 }
