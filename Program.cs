@@ -30,6 +30,7 @@ while (true)
     Console.WriteLine("1. Создать контакт");
     Console.WriteLine("2. Создать группу");
     Console.WriteLine("3. Перейти в чат");
+    Console.WriteLine("4. Сохранить");
     Console.WriteLine("0. Выйти");
 
     switch (Console.ReadLine())
@@ -42,6 +43,9 @@ while (true)
             break;
         case "3":
             ChatCommandMenu(ChooseChat());
+            break;
+        case "4":
+            messenger.Save();
             break;
         case "0":
             return;

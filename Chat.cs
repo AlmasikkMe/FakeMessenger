@@ -1,8 +1,18 @@
-﻿public class Chat(string chatName)
+﻿using System.Xml.Serialization;
+
+public class Chat(string chatName)
 {
+    public Chat() : this("Чат") { }
+
     public string ChatName = chatName;
-    private List<string> Members = [];
+    private List<string> _members = [];
     public List<Message> Messages = [];
+
+    [XmlArray("Members")] [XmlArrayItem("Member")]  public List<string> Members
+    {
+        get => _members;
+        set => _members = value ?? [];
+    }
 
     public List<string> GetMembers(string search = "")
     {
