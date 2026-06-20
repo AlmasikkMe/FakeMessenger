@@ -83,16 +83,18 @@ Chat ChooseChat()
 
 void ViewChatHistory(Chat chat)
 {
+    Console.Clear();
     chat.Messages.ForEach(message => 
     {
-        Console.WriteLine($"{message.Sender}, {message.DateTime:dd.MM.yyyy HH:mm}");
+        Console.WriteLine($"{message.Sender}, [{message.DateTime:dd.MM.yyyy HH:mm}]");
         if (message.Type != "text")
         {
-            Console.Write($"[{MessagesTypes[message.Type].Emoji} ");
+            Console.Write($"[{MessagesTypes[message.Type].Emoji}  ");
             if (message.Text == string.Empty) Console.WriteLine($"{MessagesTypes[message.Type].Name}]");
             else Console.WriteLine($"{message.Text}]");
         }
         Console.WriteLine(message.Text);
+        Console.WriteLine();
     });
 }
 
