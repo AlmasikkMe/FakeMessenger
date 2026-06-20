@@ -115,6 +115,7 @@ void SendTextMessage(Chat chat)
     DateTime dateTime = DateTime.Now;
     Console.Write("Введите время сообщения: ");
     DateTime.TryParse(Console.ReadLine(), out dateTime);
+    if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
 
     chat.AddMessage(sender: sender,
                     text: text,
@@ -142,6 +143,7 @@ void SendMultimediaMessage(Chat chat)
     DateTime dateTime = DateTime.Now;
     Console.Write("Введите время сообщения: ");
     DateTime.TryParse(Console.ReadLine(), out dateTime);
+    if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
 
     chat.AddMessage(sender: sender,
                     text: text,
