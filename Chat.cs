@@ -16,4 +16,16 @@
     {
         Members.AddRange(members.Except(Members));
     }
+
+    public void AddMessage(string? sender = null, string? text = null, string? type = null, DateTime? dateTime = null)
+    {
+        Message message = new();
+
+        if (sender != null) message.Sender = sender;
+        if (text != null) message.Text = text;
+        if (type != null) message.Type = type;
+        if (dateTime != null) message.DateTime = (DateTime)dateTime;
+
+        Messages.Add(message);
+    }
 }

@@ -1,29 +1,26 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿Console.OutputEncoding = System.Text.Encoding.UTF8;
+Console.InputEncoding = System.Text.Encoding.UTF8;
 
 Messenger messenger = new();
 
-Dictionary<string, (string Emoji, string Name, bool IsWithTime)> MessagesTypes = new()
-    {
-        { "photo",        ("🖼", "Фотография",          false) },
-        { "video",        ("📹", "Видеозапись",         false) },
-        { "video_note",   ("📹", "Видеосообщение",      true)  },
-        { "gif",          ("💥", "GIF",                 false) },
-        { "voice",        ("🎤", "Голосовое сообщение", true)  },
-        { "audio",        ("🎶", "Аудиозапись",         false) },
-        { "voice_effect", ("🔊", "Голосовой эффект",    false) },
-        { "file",         ("📂", "Файл",                false) },
-        { "sticker",      ("🎨", "Стикер",              false) },
-        { "emoji",        ("🎨", "Эмодзи",              false) },
-        { "poll",         ("📊", "Опрос",               false) },
-        { "quiz",         ("📊", "Викторина",           false) },
-        { "contact",      ("👤", "Контакт",             false) },
-        { "location",     ("📍", "Геолокация",          false) },
-        { "live_location",("🚨", "Живая геолокация",    false) },
-        { "game",         ("🎮", "Игра",                false) },
-        { "product",      ("🛍", "Продукт",             false) },
-        { "gift",         ("🎁", "Подарок",             false) }
-    };
+Dictionary<string, (string Emoji, string Name, bool IsWithTime, bool IsWithText)> MessagesTypes = new()
+{
+    { "photo",        ("🖼", "Фотография",          false, true ) },
+    { "video",        ("📹", "Видео",               false, true ) }, 
+    { "video_note",   ("📹", "Видеосообщение",      true,  false) },
+    { "gif",          ("📹", "GIF Анимация",        false, true ) }, 
+    { "voice",        ("🎤", "Голосовое сообщение", true,  false) },
+    { "audio",        ("🎶", "Аудиозапись",         false, false) },
+    { "file",         ("📂", "Файл",                false, true ) },
+    { "sticker",      ("🎨", "Стикер",              false, false) },
+    { "poll",         ("📊", "Опрос",               false, true ) },
+    { "quiz",         ("📊", "Викторина",           false, true ) },
+    { "contact",      ("👤", "Контакт",             false, false) },
+    { "location",     ("📍", "Геолокация",          false, false) },
+    { "live_location",("🚨", "Живая геолокация",    false, false) },
+    { "gift",         ("🎁", "Подарок",             false, false) },
+};
+
 
 while (true)
 {
@@ -99,7 +96,7 @@ void ViewChatHistory(Chat chat)
     });
 }
 
-void SendMessage(Chat chat)
+void SendTextMessage(Chat chat)
 {
     string? text = null;
     while (string.IsNullOrWhiteSpace(text))
@@ -113,16 +110,41 @@ void SendMessage(Chat chat)
     string? sender = SearchDialog(chat.GetMembers);
     Console.Clear();
 
+    DateTime dateTime = DateTime.Now;
+    Console.Write("Введите время сообщения: ");
+    DateTime.TryParse(Console.ReadLine(), out dateTime);
+
+    chat.AddMessage(sender: sender,
+                    text: text,
+                    dateTime: dateTime);
+}
+
+void SendMultimediaMessage(Chat chat)
+{
     Console.Write("Выберите тип сообщения (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
-    string? type = SearchDialog(searchText => MessagesTypes.Select(type => type.Key).Prepend("text").ToList());
+    string? type = SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList());
     Console.Clear();
 
-    Message message = new(sender, text, type);
+    string? text = null;
+    if (MessagesTypes[type].IsWithText)
+    {
+        Console.Write("Введите сообщение: ");
+        text = Console.ReadLine() ?? "";
+        text = text.Trim();
+    }
 
+    Console.Write("Выберите отправителя (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
+    string? sender = SearchDialog(chat.GetMembers);
+    Console.Clear();
+
+    DateTime dateTime = DateTime.Now;
     Console.Write("Введите время сообщения: ");
-    DateTime.TryParse(Console.ReadLine(), out message.DateTime);
+    DateTime.TryParse(Console.ReadLine(), out dateTime);
 
-    chat.Messages.Add(message);
+    chat.AddMessage(sender: sender,
+                    text: text,
+                    type: type,
+                    dateTime: dateTime);
 }
 
 void ChatCommandMenu(Chat chat)
@@ -136,6 +158,7 @@ void ChatCommandMenu(Chat chat)
 
         Console.WriteLine("1. Посмотреть историю чата");
         Console.WriteLine("2. Отправить сообщение");
+        Console.WriteLine("3. Отправить мультимедиа");
         Console.WriteLine("0. Выйти из чата");
 
         switch (Console.ReadLine())
@@ -145,7 +168,10 @@ void ChatCommandMenu(Chat chat)
                 Console.ReadLine();
                 break;
             case "2":
-                SendMessage(chat);
+                SendTextMessage(chat);
+                break;
+            case "3":
+                SendMultimediaMessage(chat);
                 break;
             case "0":
                 inDialog = false;

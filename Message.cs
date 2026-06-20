@@ -1,7 +1,7 @@
-﻿public class Message(string sender, string text, string type = "text")
+﻿public class Message()
 {
-    public string Sender = sender;
-    public string Text = text;
-    public string Type = type;
+    public string Sender = "Вы";
+    public string Text = "";
+    public string Type = "text";
     public DateTime DateTime = DateTime.Now;
 }
