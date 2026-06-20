@@ -31,6 +31,7 @@ while (true)
     Console.WriteLine("2. Создать группу");
     Console.WriteLine("3. Перейти в чат");
     Console.WriteLine("4. Сохранить");
+    Console.WriteLine("5. Загрузить");
     Console.WriteLine("0. Выйти");
 
     switch (Console.ReadLine())
@@ -46,6 +47,9 @@ while (true)
             break;
         case "4":
             messenger.Save();
+            break;
+        case "5":
+            messenger.Load();
             break;
         case "0":
             return;

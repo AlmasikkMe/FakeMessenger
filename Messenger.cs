@@ -8,19 +8,11 @@ public class Messenger
 
     [XmlArray("Contacts")]
     [XmlArrayItem("Contact")]
-    public List<string> Contacts
-    {
-        get => _contacts;
-        set => _contacts = value ?? [];
-    }
+    public List<string> Contacts { get => _contacts; }
 
     [XmlArray("Chats")]
     [XmlArrayItem("Chat")]
-    public List<Chat> Chats
-    {
-        get => _chats;
-        set => _chats = value ?? [];
-    }
+    public List<Chat> Chats { get => _chats; }
 
     public void NewContact(string contactName)
     {
@@ -72,5 +64,21 @@ public class Messenger
         {
             serializer.Serialize(writer, this);
         }
+    }
+
+    public void Load()
+    {
+        XmlSerializer serializer = new(typeof(Messenger));
+        Messenger? serialized;
+
+        using (FileStream fileStream = new FileStream("Save.Messager.xml", FileMode.OpenOrCreate))
+        {
+            serialized = (Messenger?)(serializer.Deserialize(fileStream));
+        }
+
+        if (serialized == null) return;
+
+        _contacts = serialized.Contacts;
+        _chats = serialized.Chats;
     }
 }
