@@ -1,58 +1,66 @@
 ﻿using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
-public class Messenger
+namespace ConsoleFakeChat;
+
+public class Messenger()
 {
-    private List<string> _contacts = [];
-    private List<Chat> _chats = [];
+    public User User { get; } = new User("@FakeChat", "Вы");
 
     [XmlArray("Contacts")]
-    [XmlArrayItem("Contact")]
-    public List<string> Contacts { get => _contacts; }
+    [XmlArrayItem("User")]
+    public List<User> Contacts { get => field; private set; } = [];
 
     [XmlArray("Chats")]
     [XmlArrayItem("Chat")]
-    public List<Chat> Chats { get => _chats; }
+    public List<Chat> Chats { get => field; private set; } = [];
 
-    public void NewContact(string contactName)
+    public void NewContact(string username, string firstName, string lastName = "")
     {
-        contactName = contactName.IsWhiteSpace() ? $"Контакт {_contacts.Count + 1}" : contactName.Trim();
-        _contacts.Add(contactName);
+        if (username.IsWhiteSpace()) username = $"@user{Contacts.Count + 1}";
+        if (firstName.IsWhiteSpace()) firstName =  $"Контакт {Contacts.Count + 1}";
 
-        Chat chat = new(contactName);
-        chat.AddMembers(["Вы", contactName]);
+        if (!username.StartsWith("@")) username = $"@{username}";
 
-        _chats.Add(chat);
+        if (Contacts.Any(contact => contact.Username == username)) 
+            throw new ArgumentException($"Пользователь с именем {username} уже существует!");
+
+        Contacts.Add(new(username, firstName, lastName));
     }
 
-    public void NewGroup(string groupName, string[] members)
+    public void NewGroup(string groupName, List<User> members)
     {
-        if (members.Length == 0) return;
+        if (!members.Contains(User)) members.Prepend(User);
 
-        List<string> membersList = ["Вы"];
+        if (members.Count == 1) throw new ArgumentException("Требуется как минимум 1 участник группы");
 
-        for (int i = 0; i < members.Length; i++)
-        {
-            if (!members[i].IsWhiteSpace()) membersList.Add(members[i].Trim());
-        }
+        if (members.Union(Contacts).GroupBy(member => member.Username).Any(g => g.Count() > 1)) 
+            throw new ArgumentException("Обнаружены разные объекты с одинаковым UserName!");
 
         if (groupName.IsWhiteSpace()) 
         {
-            groupName = string.Join(", ", membersList.Take(3));
+            groupName = string.Join(", ", members.Take(3).Select(member => member.FullName));
 
-            if (membersList.Count > 3) groupName += $" и ещё {membersList.Count - 3}";
+            if (members.Count > 3) groupName += $" и ещё {members.Count - 3}";
         }
 
         Chat chat = new(groupName);
-        chat.AddMembers(membersList);
+        chat.AddMembers(members);
 
-        _chats.Add(chat);
+        Chats.Add(chat);
     }
     public List<Chat> GetChats(string search = "")
     {
-        return (from chat in _chats
+        return (from chat in Chats
                 where chat.ChatName.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
                 select chat)
+                .ToList();
+    }
+    public List<User> GetContacts(string search = "")
+    {
+        return (from contact in Contacts
+                where contact.Username.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
+                select contact)
                 .ToList();
     }
     
@@ -78,7 +86,7 @@ public class Messenger
 
         if (serialized == null) return;
 
-        _contacts = serialized.Contacts;
-        _chats = serialized.Chats;
+        Contacts = serialized.Contacts;
+        Chats = serialized.Chats;
     }
 }
