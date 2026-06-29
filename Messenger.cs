@@ -5,7 +5,7 @@ namespace ConsoleFakeChat;
 
 public class Messenger()
 {
-    public User User { get; } = new User("@FakeChat", "Вы");
+    public static User User { get; } = new User("@FakeChat", "Вы");
 
     [XmlArray("Contacts")]
     [XmlArrayItem("User")]
@@ -64,6 +64,11 @@ public class Messenger()
                 .ToList();
     }
     
+    public void CreateContactChat(User user)
+    {
+        if (!Chats.Contains(user.Chat)) Chats.Add(user.Chat);
+    }
+
     public void Save()
     {
         XmlSerializer serializer = new(typeof(Messenger));

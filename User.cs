@@ -31,5 +31,18 @@ public class User(string username, string firstName, string lastName = "")
         set => field = value.Trim(); 
     } = lastName;
     public string FullName => $"{FirstName} {LastName}";
-    public Chat Chat { get { field ??= new(FullName); field.ChatName = FullName; return field; } }
+    public Chat Chat 
+    { 
+        get 
+        { 
+            if (field == null)
+            { 
+                field = new(FullName);
+                Chat.AddMembers([Messenger.User, this]);
+            } 
+            field.ChatName = FullName; return field; 
+        } 
+    }
+    private Chat? _chat = null;
+    public bool IsHasChat => !(_chat == null);
 }

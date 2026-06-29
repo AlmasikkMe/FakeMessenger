@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
@@ -24,6 +25,7 @@ public static class ConsoleUI
         Console.WriteLine("3. Перейти в чат");
         Console.WriteLine("4. Сохранить");
         Console.WriteLine("5. Загрузить");
+        Console.WriteLine("6. Создать чат с контактом");
         Console.WriteLine("0. Выйти");
 
         switch (Console.ReadLine())
@@ -42,6 +44,9 @@ public static class ConsoleUI
                 break;
             case "5":
                 MessagerConsoleUI.Load();
+                break;
+            case "6":
+                MessagerConsoleUI.CreateContactChat();
                 break;
             case "0":
                 return;
@@ -312,6 +317,15 @@ public static class MessagerConsoleUI
                         text: text,
                         type: type,
                         dateTime: dateTime);
+    }
+
+    public static void CreateContactChat()
+    {
+        string contactName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search)
+                                                                       .Where(contact => !contact.IsHasChat)
+                                                                       .Select(contact => contact.Username)
+                                                                       .ToList());
+        Messenger.CreateContactChat(Messenger.GetContacts(contactName).First(contact => contact.Username == contactName));
     }
 
     public static void Save()
