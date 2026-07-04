@@ -30,7 +30,7 @@ public class User(string username, string firstName, string lastName = "")
         get;
         set => field = value.Trim(); 
     } = lastName;
-    public string FullName => $"{FirstName} {LastName}";
+    public string FullName => $"{FirstName} {LastName}".Trim();
     public Chat Chat 
     { 
         get 
