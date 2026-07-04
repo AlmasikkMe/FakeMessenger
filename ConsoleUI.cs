@@ -1,55 +1,51 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-
-namespace ConsoleFakeChat.ConsoleUI;
+﻿namespace ConsoleFakeChat.ConsoleUI;
 public static class ConsoleUI
 {
     public static void Run()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.InputEncoding = System.Text.Encoding.UTF8;
-            MainMenu();
-        }
+        MainMenu();
     }
 
     public static void MainMenu()
     {
-        Console.Clear();
-        Console.WriteLine("Что вы хотите сделать?");
-
-        Console.WriteLine("1. Создать контакт");
-        Console.WriteLine("2. Создать группу");
-        Console.WriteLine("3. Перейти в чат");
-        Console.WriteLine("4. Сохранить");
-        Console.WriteLine("5. Загрузить");
-        Console.WriteLine("6. Создать чат с контактом");
-        Console.WriteLine("0. Выйти");
-
-        switch (Console.ReadLine())
+        while (true)
         {
-            case "1":
-                MessagerConsoleUI.NewContact();
-                break;
-            case "2":
-                MessagerConsoleUI.NewGroup();
-                break;
-            case "3":
-                ChatCommandMenu(MessagerConsoleUI.ChooseChat());
-                break;
-            case "4":
-                MessagerConsoleUI.Save();
-                break;
-            case "5":
-                MessagerConsoleUI.Load();
-                break;
-            case "6":
-                MessagerConsoleUI.CreateContactChat();
-                break;
-            case "0":
-                return;
+            Console.Clear();
+            Console.WriteLine("Что вы хотите сделать?");
+
+            Console.WriteLine("1. Создать контакт");
+            Console.WriteLine("2. Создать группу");
+            Console.WriteLine("3. Перейти в чат");
+            Console.WriteLine("4. Сохранить");
+            Console.WriteLine("5. Загрузить");
+            Console.WriteLine("6. Создать чат с контактом");
+            Console.WriteLine("0. Выйти");
+
+            switch (Console.ReadLine())
+            {
+                case "1":
+                    MessagerConsoleUI.NewContact();
+                    break;
+                case "2":
+                    MessagerConsoleUI.NewGroup();
+                    break;
+                case "3":
+                    ChatCommandMenu(MessagerConsoleUI.ChooseChat());
+                    break;
+                case "4":
+                    MessagerConsoleUI.Save();
+                    break;
+                case "5":
+                    MessagerConsoleUI.Load();
+                    break;
+                case "6":
+                    MessagerConsoleUI.CreateContactChat();
+                    break;
+                case "0":
+                    return;
+            }
         }
     }
 
