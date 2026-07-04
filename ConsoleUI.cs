@@ -9,8 +9,8 @@ public static class ConsoleUI
 {
     public static void Run()
     {
-        while (true)
-        {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.InputEncoding = System.Text.Encoding.UTF8;
             MainMenu();
         }
     }
