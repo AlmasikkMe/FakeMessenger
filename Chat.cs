@@ -22,7 +22,7 @@ public class Chat(string chatName)
 
     public void AddMembers(List<User> members)
     {
-        Members.AddRange(members.Except(Members));
+        Members.AddRange(members.Except(Members).ToList());
     }
 
     public void AddMessage(User sender, string? text = null, string? type = null, DateTime? dateTime = null)

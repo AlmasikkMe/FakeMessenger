@@ -240,13 +240,32 @@ public static class MessagerConsoleUI
     public static void NewGroup()
     {
         List<User> members = [];
-        Console.Write("Выберите членов группы (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
-        while (true)
-        {
-            string? sender = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search).Except(members).Select(member => member.Username).ToList());
+        bool isChooseMembers = true;
 
-            Console.Write("Продолжить добавление членов группы? (Y/n): ");
-            if (Console.ReadKey().Key == ConsoleKey.Y) break;
+        Console.Write("Выберите членов группы (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
+        while (isChooseMembers)
+        {
+            var searchQuery = ConsoleUI.SearchDialog(search =>
+                Messenger.GetContacts(search)
+                         .Except(members)
+                         .Select(member => member.Username)
+                         .ToList()
+            );
+
+            User contact = Messenger.Contacts.First(contact => contact.Username == searchQuery);
+            members.Add(contact);
+
+            bool isYNDialog = true;
+            while (isChooseMembers && isYNDialog)
+            {
+                Console.Clear();
+                Console.Write("Продолжить добавление членов группы? (Y/n): ");
+                switch (Console.ReadKey().Key)
+                {
+                    case ConsoleKey.N: isChooseMembers = false; break;
+                    case ConsoleKey.Y: isYNDialog = false; break;
+                }
+            }
         }
 
         Console.Write("Введите имя для группы: ");
