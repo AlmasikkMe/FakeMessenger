@@ -1,31 +1,53 @@
 ﻿using System.Runtime.Serialization;
+using System.Security.AccessControl;
 using System.Xml.Serialization;
 
 namespace ConsoleFakeChat;
 
-public class Messenger()
+[XmlRoot("Messager")]
+public class XMLMessagerExport
 {
-    public static User User { get; } = new User("@FakeChat", "Вы");
+    public User User { get; set; } = Messenger.User;
 
     [XmlArray("Contacts")]
-    [XmlArrayItem("User")]
-    public List<User> Contacts { get => field; private set; } = [];
+    [XmlArrayItem("Contact")]
+    public List<User> Contacts = [];
 
     [XmlArray("Chats")]
     [XmlArrayItem("Chat")]
-    public List<Chat> Chats { get => field; private set; } = [];
+    public List<Chat> Chats = [];
+}
+
+public class Messenger()
+{
+    public static User User => _user;
+    private static User _user = new("@FakeChat", "Вы");
+    public FileInfo SaveFile { get; set; } = new("Save.Messager.xml");
+    public IReadOnlyList<User> Contacts => _contacts.AsReadOnly();
+    private List<User> _contacts = [];
+    public IReadOnlyList<Chat> Chats => _chats.AsReadOnly();
+    private List<Chat> _chats = [];
 
     public void NewContact(string username, string firstName, string lastName = "")
     {
-        if (username.IsWhiteSpace()) username = $"@user{Contacts.Count + 1}";
-        if (firstName.IsWhiteSpace()) firstName =  $"Контакт {Contacts.Count + 1}";
+        if (username.IsWhiteSpace()) username = $"@user{_contacts.Count + 1}";
+        if (firstName.IsWhiteSpace()) firstName =  $"Контакт {_contacts.Count + 1}";
 
         if (!username.StartsWith("@")) username = $"@{username}";
 
-        if (Contacts.Any(contact => contact.Username == username)) 
+        if (_contacts.Any(contact => contact.Username == username)) 
             throw new ArgumentException($"Пользователь с именем {username} уже существует!");
 
-        Contacts.Add(new(username, firstName, lastName));
+        _contacts.Add(new(username, firstName, lastName));
+    }
+
+    public void NewContact(User user)
+    {
+        if (!user.Username.StartsWith("@")) user.Username = $"@{user.Username}";
+        if (_contacts.Any(contact => contact.Username == user.Username))
+            throw new ArgumentException($"Пользователь с именем {user.Username} уже существует!");
+
+        _contacts.Add(user);
     }
 
     public void NewGroup(string groupName, List<User> members)
@@ -34,7 +56,7 @@ public class Messenger()
 
         if (members.Count == 1) throw new ArgumentException("Требуется как минимум 1 участник группы");
 
-        if (members.Union(Contacts).GroupBy(member => member.Username).Any(g => g.Count() > 1)) 
+        if (members.Union(_contacts).GroupBy(member => member.Username).Any(g => g.Count() > 1)) 
             throw new ArgumentException("Обнаружены разные объекты с одинаковым UserName!");
 
         if (groupName.IsWhiteSpace()) 
@@ -47,51 +69,77 @@ public class Messenger()
         Chat chat = new(groupName);
         chat.AddMembers(members);
 
-        Chats.Add(chat);
+        _chats.Add(chat);
     }
     public List<Chat> GetChats(string search = "")
     {
-        return (from chat in Chats
+        return (from chat in _chats
                 where chat.ChatName.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
                 select chat)
                 .ToList();
     }
     public List<User> GetContacts(string search = "")
     {
-        return (from contact in Contacts
+        return (from contact in _contacts
                 where contact.Username.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
                 select contact)
                 .ToList();
     }
     
+    [Obsolete("Используйте AddChat(User.Chat) вместо этого метода.")]
     public void CreateContactChat(User user)
     {
-        if (!Chats.Contains(user.Chat)) Chats.Add(user.Chat);
+        AddChat(user.Chat);
+    }
+
+    public void AddChat(Chat chat)
+    {
+        if (_chats.Contains(chat)) 
+            throw new ArgumentException($"Чат {chat.ChatName} уже существует");
+        
+        _chats.Add(chat);
     }
 
     public void Save()
     {
-        XmlSerializer serializer = new(typeof(Messenger));
-
-        using (StreamWriter writer = new("Save.Messager.xml"))
+        XMLMessagerExport export = new()
         {
-            serializer.Serialize(writer, this);
+            Contacts = _contacts,
+            Chats = _chats
+        };
+
+        XmlSerializer serializer = new(typeof(XMLMessagerExport));
+
+        using (StreamWriter writer = new(SaveFile.FullName))
+        {
+            serializer.Serialize(writer, export);
         }
     }
 
     public void Load()
     {
-        XmlSerializer serializer = new(typeof(Messenger));
-        Messenger? serialized;
+        XmlSerializer serializer = new(typeof(XMLMessagerExport));
+        XMLMessagerExport? serialized;
 
-        using (FileStream fileStream = new FileStream("Save.Messager.xml", FileMode.OpenOrCreate))
+        using (FileStream fileStream = new FileStream(SaveFile.FullName, FileMode.OpenOrCreate))
         {
-            serialized = (Messenger?)(serializer.Deserialize(fileStream));
+            serialized = (XMLMessagerExport?)(serializer.Deserialize(fileStream));
         }
 
-        if (serialized == null) return;
+        if (serialized == null)
+        {
+            string reason = SaveFile.Length == 0
+                ? "пуст"
+                : "содержит неверные данные";
 
-        Contacts = serialized.Contacts;
-        Chats = serialized.Chats;
+            throw new InvalidOperationException($"Файл {SaveFile.Name} {reason}.");
+        }
+
+        _contacts = [];
+        _chats = [];
+
+        _user = serialized.User;
+        serialized.Contacts.ForEach(NewContact);
+        serialized.Chats.ForEach(AddChat);
     }
 }
