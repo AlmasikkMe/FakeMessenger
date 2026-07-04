@@ -321,7 +321,7 @@ public static class MessagerConsoleUI
                                                                        .Where(contact => !contact.IsHasChat)
                                                                        .Select(contact => contact.Username)
                                                                        .ToList());
-        Messenger.CreateContactChat(Messenger.GetContacts(contactName).First(contact => contact.Username == contactName));
+        Messenger.AddChat(Messenger.GetContacts(contactName).First(contact => contact.Username == contactName).Chat);
     }
 
     public static void Save()

@@ -85,13 +85,6 @@ public class Messenger()
                 select contact)
                 .ToList();
     }
-    
-    [Obsolete("Используйте AddChat(User.Chat) вместо этого метода.")]
-    public void CreateContactChat(User user)
-    {
-        AddChat(user.Chat);
-    }
-
     public void AddChat(Chat chat)
     {
         if (_chats.Contains(chat)) 
