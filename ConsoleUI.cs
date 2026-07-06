@@ -84,29 +84,33 @@ public static class ConsoleUI
 
     public static string SearchDialog(Func<string, List<string>> optionsUpdate)
     {
+        string instruction = "Напишите для поиска (ESC для выхода): ";
+
         Console.Clear();
 
         Console.CursorVisible = false;
         int selectIndex = -1;
         int offset = 0;
 
-        Console.WriteLine("Напишите для поиска: ");
+        Console.WriteLine(instruction);
         string searchText = "";
 
         List<string> options = optionsUpdate(searchText);
         options.Take(Console.WindowHeight - 2)
-            .ToList()
-            .ForEach(option => Console.WriteLine(option));
+               .ToList()
+               .ForEach(option => Console.WriteLine(option));
 
         while (true)
         {
+            if (options.Count is 0) throw new ArgumentException("Нет списка для выбора");
+
             Console.SetCursorPosition(0, selectIndex - offset + 1);
 
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
 
             if (selectIndex != -1) Console.Write(options[selectIndex]);
-            else Console.Write("Напишите для поиска: ");
+            else Console.Write(instruction);
 
             Console.ResetColor();
 
@@ -126,7 +130,7 @@ public static class ConsoleUI
                             offset--;
 
                             Console.Clear();
-                            Console.WriteLine("Напишите для поиска: ");
+                            Console.WriteLine(instruction);
                             options.Skip(offset)
                                 .Take(Console.WindowHeight - 2)
                                 .ToList()
@@ -140,7 +144,7 @@ public static class ConsoleUI
                     {
                         Console.SetCursorPosition(0, Console.CursorTop);
                         if (selectIndex != -1) Console.Write(options[selectIndex]);
-                        else Console.Write("Напишите для поиска: ");
+                        else Console.Write(instruction);
 
                         selectIndex++;
                         if (selectIndex - offset + 1 >= Console.WindowHeight - 1)
@@ -148,7 +152,7 @@ public static class ConsoleUI
                             offset++;
 
                             Console.Clear();
-                            Console.WriteLine("Напишите для поиска: ");
+                            Console.WriteLine(instruction);
                             options.Skip(offset)
                                 .Take(Console.WindowHeight - 2)
                                 .ToList()
@@ -163,7 +167,7 @@ public static class ConsoleUI
                     if (selectIndex == -1)
                     {
                         Console.Clear();
-                        Console.Write("Напишите для поиска: ");
+                        Console.Write(instruction);
 
                         string? input = Console.ReadLine();
                         if (input == null) Console.WriteLine();
@@ -179,6 +183,8 @@ public static class ConsoleUI
                     {
                         return options[selectIndex];
                     }
+                case ConsoleKey.Escape:
+                    throw new OperationCanceledException("Отмена выбора");
             }
         }
     }
