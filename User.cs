@@ -1,8 +1,14 @@
 ﻿namespace ConsoleFakeChat;
 
-public class User(string username, string firstName, string lastName = "")
+public class User
 {
-    public User() : this("@example", "Example contact") { }
+    public User(string username, string firstName, string lastName = "") 
+    {
+        Username = username;
+        FirstName = firstName;
+        LastName = lastName;
+    }
+    public User() : this("@example", "Пользователь") { }
 
     public string Username
     {
@@ -11,25 +17,25 @@ public class User(string username, string firstName, string lastName = "")
             string username = value;
             if (!username.StartsWith("@")) username = $"@{username}";
 
-            if (username.Skip(1).All(c => char.IsAsciiLetter(c) || char.IsNumber(c)))
+            if (username.Skip(1).All(char.IsAsciiLetterOrDigit))
             {
-                if (username.Length > 5) field = username;
-                else throw new ArgumentException("Имя пользователя должно содержать 5 или более символов (не считая @)");
+                if (username.Length - 1 is >= 5 and <= 20) field = username;
+                else throw new ArgumentException("Имя пользователя должно содержать от 5 до 20 символов (не считая @)");
             }
             else throw new ArgumentException("Имя пользователя допускает только латинские символы или цифры");
         }
-    } = username;
+    }
 
     public string FirstName 
     { 
         get;
         set => field = !value.IsWhiteSpace() ? value.Trim() : throw new ArgumentException("Имя не может быть пустым"); 
-    } = firstName;
+    } 
     public string LastName 
     {
         get;
         set => field = value.Trim(); 
-    } = lastName;
+    } 
     public string FullName => $"{FirstName} {LastName}".Trim();
     public Chat Chat 
     { 

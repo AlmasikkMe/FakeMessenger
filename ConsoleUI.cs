@@ -234,7 +234,7 @@ public static class MessagerConsoleUI
         string? lastName = Console.ReadLine();
 
         try { Messenger.NewContact(username ?? "", firstName ?? "", lastName ?? ""); }
-        catch (Exception ex) { Console.WriteLine(ex.Message); }
+        catch (Exception ex) { Console.WriteLine(ex.Message); Console.ReadLine(); }
     }
 
     public static void NewGroup()
@@ -272,7 +272,8 @@ public static class MessagerConsoleUI
         string? userInput = Console.ReadLine();
         userInput ??= "";
 
-        Messenger.NewGroup(userInput, members);
+        try { Messenger.NewGroup(userInput, members); }
+        catch (Exception ex) { Console.WriteLine(ex.Message); Console.ReadLine(); }
     }
 
     public static Chat ChooseChat()
@@ -336,11 +337,11 @@ public static class MessagerConsoleUI
 
     public static void CreateContactChat()
     {
-        string contactName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search)
-                                                                       .Where(contact => !contact.IsHasChat)
-                                                                       .Select(contact => contact.Username)
-                                                                       .ToList());
-        Messenger.AddChat(Messenger.GetContacts(contactName).First(contact => contact.Username == contactName).Chat);
+        string contactName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search).Where(contact => !contact.IsHasChat).Select(contact => contact.Username).ToList());
+        
+        Chat chat = Messenger.GetContacts(contactName).First(contact => contact.Username == contactName).Chat;
+        try { Messenger.AddChat(chat); }
+        catch (Exception ex) { Console.WriteLine(ex.Message); Console.ReadLine(); }
     }
 
     public static void Save()
