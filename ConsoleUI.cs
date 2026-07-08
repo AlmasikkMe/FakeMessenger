@@ -12,39 +12,47 @@ public static class ConsoleUI
     {
         while (true)
         {
-            Console.Clear();
-            Console.WriteLine("Что вы хотите сделать?");
-
-            Console.WriteLine("1. Создать контакт");
-            Console.WriteLine("2. Создать группу");
-            Console.WriteLine("3. Перейти в чат");
-            Console.WriteLine("4. Сохранить");
-            Console.WriteLine("5. Загрузить");
-            Console.WriteLine("6. Создать чат с контактом");
-            Console.WriteLine("0. Выйти");
-
-            switch (Console.ReadLine())
+            try
             {
-                case "1":
-                    MessagerConsoleUI.NewContact();
-                    break;
-                case "2":
-                    MessagerConsoleUI.NewGroup();
-                    break;
-                case "3":
-                    ChatCommandMenu(MessagerConsoleUI.ChooseChat());
-                    break;
-                case "4":
-                    MessagerConsoleUI.Save();
-                    break;
-                case "5":
-                    MessagerConsoleUI.Load();
-                    break;
-                case "6":
-                    MessagerConsoleUI.CreateContactChat();
-                    break;
-                case "0":
-                    return;
+                Console.Clear();
+                Console.WriteLine("Что вы хотите сделать?");
+
+                Console.WriteLine("1. Создать контакт");
+                Console.WriteLine("2. Создать группу");
+                Console.WriteLine("3. Перейти в чат");
+                Console.WriteLine("4. Сохранить");
+                Console.WriteLine("5. Загрузить");
+                Console.WriteLine("6. Создать чат с контактом");
+                Console.WriteLine("0. Выйти");
+
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        MessagerConsoleUI.NewContact();
+                        break;
+                    case "2":
+                        MessagerConsoleUI.NewGroup();
+                        break;
+                    case "3":
+                        ChatCommandMenu(MessagerConsoleUI.ChooseChat());
+                        break;
+                    case "4":
+                        MessagerConsoleUI.Save();
+                        break;
+                    case "5":
+                        MessagerConsoleUI.Load();
+                        break;
+                    case "6":
+                        MessagerConsoleUI.CreateContactChat();
+                        break;
+                    case "0":
+                        return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.ReadLine();
             }
         }
     }
@@ -54,30 +62,38 @@ public static class ConsoleUI
         bool inDialog = true;
         while (inDialog)
         {
-            Console.Clear();
-            Console.WriteLine($"Вы в чате {chat.ChatName}");
-            Console.WriteLine("Что вы хотите сделать?");
-
-            Console.WriteLine("1. Посмотреть историю чата");
-            Console.WriteLine("2. Отправить сообщение");
-            Console.WriteLine("3. Отправить мультимедиа");
-            Console.WriteLine("0. Выйти из чата");
-
-            switch (Console.ReadLine())
+            try
             {
-                case "1":
-                    MessagerConsoleUI.ViewChatHistory(chat);
-                    Console.ReadLine();
-                    break;
-                case "2":
-                    MessagerConsoleUI.SendTextMessage(chat);
-                    break;
-                case "3":
-                    MessagerConsoleUI.SendMultimediaMessage(chat);
-                    break;
-                case "0":
-                    inDialog = false;
-                    break;
+                Console.Clear();
+                Console.WriteLine($"Вы в чате {chat.ChatName}");
+                Console.WriteLine("Что вы хотите сделать?");
+
+                Console.WriteLine("1. Посмотреть историю чата");
+                Console.WriteLine("2. Отправить сообщение");
+                Console.WriteLine("3. Отправить мультимедиа");
+                Console.WriteLine("0. Выйти из чата");
+
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        MessagerConsoleUI.ViewChatHistory(chat);
+                        Console.ReadLine();
+                        break;
+                    case "2":
+                        MessagerConsoleUI.SendTextMessage(chat);
+                        break;
+                    case "3":
+                        MessagerConsoleUI.SendMultimediaMessage(chat);
+                        break;
+                    case "0":
+                        inDialog = false;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.ReadLine();
             }
         }
     }
@@ -239,8 +255,7 @@ public static class MessagerConsoleUI
         Console.Write("Введите фамилию для контакта: ");
         string? lastName = Console.ReadLine();
 
-        try { Messenger.NewContact(username ?? "", firstName ?? "", lastName ?? ""); }
-        catch (Exception ex) { Console.WriteLine(ex.Message); Console.ReadLine(); }
+        Messenger.NewContact(username ?? "", firstName ?? "", lastName ?? "");
     }
 
     public static void NewGroup()
@@ -278,8 +293,7 @@ public static class MessagerConsoleUI
         string? userInput = Console.ReadLine();
         userInput ??= "";
 
-        try { Messenger.NewGroup(userInput, members); }
-        catch (Exception ex) { Console.WriteLine(ex.Message); Console.ReadLine(); }
+        Messenger.NewGroup(userInput, members);
     }
 
     public static Chat ChooseChat()
@@ -346,8 +360,7 @@ public static class MessagerConsoleUI
         string contactName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search).Where(contact => !contact.IsHasChat).Select(contact => contact.Username).ToList());
         
         Chat chat = Messenger.GetContacts(contactName).First(contact => contact.Username == contactName).Chat;
-        try { Messenger.AddChat(chat); }
-        catch (Exception ex) { Console.WriteLine(ex.Message); Console.ReadLine(); }
+        Messenger.AddChat(chat);
     }
 
     public static void Save()
