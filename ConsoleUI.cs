@@ -289,11 +289,15 @@ public static class MessagerConsoleUI
             }
         }
 
-        Console.Write("Введите имя для группы: ");
-        string? userInput = Console.ReadLine();
-        userInput ??= "";
+        Console.Write("Введите уникальное имя группы (только латинские символы и цифры): ");
+        string? chatName = Console.ReadLine();
+        chatName ??= "";
 
-        Messenger.NewGroup(userInput, members);
+        Console.Write("Введите название группы: ");
+        string? groupName = Console.ReadLine();
+        groupName ??= "";
+
+        Messenger.NewGroup(chatName, groupName, members);
     }
 
     public static Chat ChooseChat()

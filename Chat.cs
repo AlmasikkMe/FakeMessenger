@@ -1,11 +1,31 @@
 ﻿using System.Xml.Serialization;
 
 namespace ConsoleFakeChat;
-public class Chat(string chatName)
+public class Chat(string chatName, string name)
 {
-    public Chat() : this("Чат") { }
+    public Chat() : this("example", "Чат") { }
 
-    public string ChatName = chatName;
+    public string ChatName
+    {
+        get;
+        set
+        {
+            string chatName = value.Trim();
+            if (!chatName.StartsWith("@")) chatName = $"@{chatName}";
+
+            if (chatName.Skip(1).All(char.IsAsciiLetterOrDigit))
+            {
+                if (chatName.Length - 1 is >= 5 and <= 20) field = chatName;
+                else throw new ArgumentException("Уникальное имя чата должно содержать от 5 до 20 символов (не считая @)");
+            }
+            else throw new ArgumentException("Уникальное имя чата допускает только латинские символы или цифры");
+        }
+    } = chatName;
+    public string Name
+    {
+        get;
+        set => field = !value.IsWhiteSpace() ? value.Trim() : throw new ArgumentException("Название чата не может быть пустым");
+    } = name;
     private List<User> _members = [];
     private List<Message> _messages = [];
 

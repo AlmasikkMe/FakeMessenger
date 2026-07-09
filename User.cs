@@ -1,4 +1,6 @@
-﻿namespace ConsoleFakeChat;
+﻿using System.Xml.Serialization;
+
+namespace ConsoleFakeChat;
 
 public class User
 {
@@ -37,17 +39,22 @@ public class User
         set => field = value.Trim(); 
     } 
     public string FullName => $"{FirstName} {LastName}".Trim();
-    public Chat Chat 
+    [XmlIgnore] public Chat Chat 
     { 
         get 
         { 
-            if (field == null)
+            if (_chat == null)
             { 
-                field = new(FullName);
+                _chat = new(Username, FullName);
                 Chat.AddMembers([Messenger.User, this]);
             } 
-            field.ChatName = FullName; return field; 
+            _chat.ChatName = FullName; return _chat; 
         } 
+        set
+        {
+            if (value.ChatName == Username) _chat = value;
+            else throw new ArgumentException("Уникальное имя чата должно соответствовать имени пользователя");
+        }
     }
     private Chat? _chat = null;
     public bool IsHasChat => !(_chat == null);

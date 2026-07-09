@@ -50,11 +50,19 @@ public class Messenger()
         _contacts.Add(user);
     }
 
-    public void NewGroup(string groupName, List<User> members)
+    public void NewGroup(string chatName, string groupName, List<User> members)
     {
-        if (!members.Contains(User)) members.Prepend(User);
+        if (!members.Contains(User)) 
+            members.Prepend(User);
 
-        if (members.Count == 1) throw new ArgumentException("Требуется как минимум 1 участник группы");
+        if (chatName.IsWhiteSpace()) 
+            chatName = $"@chat{_chats.Count + 1}";
+
+        if (_chats.Any(chat => chat.ChatName == chatName)) 
+            throw new ArgumentException("Чат с таким уникальным именем уже существует!");
+
+        if (members.Count == 1) 
+            throw new ArgumentException("Требуется как минимум 1 участник группы");
 
         if (members.Union(_contacts).GroupBy(member => member.Username).Any(g => g.Count() > 1)) 
             throw new ArgumentException("Обнаружены разные объекты с одинаковым UserName!");
@@ -66,7 +74,8 @@ public class Messenger()
             if (members.Count > 3) groupName += $" и ещё {members.Count - 3}";
         }
 
-        Chat chat = new(groupName);
+
+        Chat chat = new(chatName, groupName);
         chat.AddMembers(members);
 
         _chats.Add(chat);
@@ -87,7 +96,7 @@ public class Messenger()
     }
     public void AddChat(Chat chat)
     {
-        if (_chats.Contains(chat)) 
+        if (_chats.Select(chat => chat.ChatName).Contains(chat.ChatName)) 
             throw new ArgumentException($"Чат {chat.ChatName} уже существует");
         
         _chats.Add(chat);
