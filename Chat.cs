@@ -1,8 +1,51 @@
-﻿using System.Xml.Serialization;
+﻿using System.Data;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace ConsoleFakeChat;
 public class Chat(string chatName, string name)
 {
+    public Chat(XElement xElement, List<User> users) : this(xElement, users.AsReadOnly()) { }
+    public Chat(XElement xElement, IReadOnlyList<User> users) : this("@example", "Чат")
+    {
+        ChatName = xElement.Element("ChatName")?.Value ?? throw new InvalidOperationException("Обязательный элемент ChatName не найден в элементе Chat");
+        Name = xElement.Element("Name")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Name не найден в элементе Chat {ChatName}");
+
+        _members = [];
+        XElement membersElement = xElement.Element("Members") ?? throw new InvalidOperationException($"Обязательный элемент Members не найден в элементе Chat {ChatName}");
+        List<string> membersUsernames = membersElement
+            .Elements("User")
+            .Select(member => member.Value)
+            .ToList();
+
+        AddMembers(
+            membersUsernames
+            .Select(username => 
+                users.FirstOrDefault(user => user.Username == username) ?? throw new InvalidOperationException($"Пользователь {username} из элемента Chat {ChatName} не найден")
+                )
+            .ToList());
+
+        _messages = [];
+        XElement? messagesElement = xElement.Element("Messages");
+        if (messagesElement is not null)
+        {
+            foreach (var message in messagesElement.Elements("Message"))
+{
+                string senderUsername = message.Element("Sender")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Sender не найден в элементе Message из элемента Chat {ChatName}");
+                User sender = _members.FirstOrDefault(member => member.Username == senderUsername) ?? throw new InvalidOperationException($"Отправитель {senderUsername} не числится в участниках чата {ChatName}");
+
+                string? text = message.Element("Text")?.Value.Trim();
+                string? type = message.Element("Type")?.Value.Trim();
+
+                string dateTimeValue = (message.Element("DateTime") ?? throw new InvalidOperationException($"Обязательный элемент DateTime не найден в элементе Message из элемента Chat {ChatName}")).Value;
+                if (dateTimeValue.IsWhiteSpace()) throw new InvalidOperationException($"Пустой элемент DateTime в элементе Message из элемента Chat {ChatName}");
+                DateTime dateTime;
+                if (!DateTime.TryParse(dateTimeValue, out dateTime)) throw new InvalidOperationException($"Неудачный парсинг элемента DateTime в элементе Message из элемента Chat {ChatName}");
+
+                AddMessage(sender, text, type, dateTime);
+            } 
+            }
+    }
     public Chat() : this("example", "Чат") { }
 
     public string ChatName
@@ -31,6 +74,14 @@ public class Chat(string chatName, string name)
 
     [XmlArray("Members")] [XmlArrayItem("Member")]  public List<User> Members { get => _members; }
     [XmlArray("Messages")] [XmlArrayItem("Message")]  public List<Message> Messages { get => _messages; }
+
+    public XElement ToXElement() =>
+        new("Chat",
+            new XElement("ChatName", ChatName),
+            new XElement("Name", Name),
+            new XElement("Members", from member in _members select new XElement("User", member.Username)),
+            new XElement("Messages", from message in _messages select message.ToXElement())
+            );
 
     public List<User> GetMembers(string search = "")
     {
