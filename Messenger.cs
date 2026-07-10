@@ -1,22 +1,9 @@
 ﻿using System.Runtime.Serialization;
 using System.Security.AccessControl;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace ConsoleFakeChat;
-
-[XmlRoot("Messager")]
-public class XMLMessagerExport
-{
-    public User User { get; set; } = Messenger.User;
-
-    [XmlArray("Contacts")]
-    [XmlArrayItem("Contact")]
-    public List<User> Contacts = [];
-
-    [XmlArray("Chats")]
-    [XmlArrayItem("Chat")]
-    public List<Chat> Chats = [];
-}
 
 public class Messenger()
 {
@@ -104,44 +91,67 @@ public class Messenger()
 
     public void Save()
     {
-        XMLMessagerExport export = new()
-        {
-            Contacts = _contacts,
-            Chats = _chats
-        };
+        XDocument doc = new(
+            new XElement("Messenger",
+                User.ToXElement(),
+                new XElement("Contacts", from user in _contacts select user.ToXElement()),
+                new XElement("Chats", from chat in _chats select chat.ToXElement())
+                )
+            );
 
-        XmlSerializer serializer = new(typeof(XMLMessagerExport));
-
-        using (StreamWriter writer = new(SaveFile.FullName))
-        {
-            serializer.Serialize(writer, export);
-        }
+        doc.Save(SaveFile.FullName);
     }
 
-    public void Load()
+    public void Load(Action<string>? elementNullHandler = null, Action<string, Exception>? elementExceptionHandler = null)
     {
-        XmlSerializer serializer = new(typeof(XMLMessagerExport));
-        XMLMessagerExport? serialized;
+        XDocument doc = XDocument.Load(SaveFile.FullName);
 
-        using (FileStream fileStream = new FileStream(SaveFile.FullName, FileMode.OpenOrCreate))
+        if (doc.Root is null) throw new InvalidOperationException($"Не удалось получить корневой элемент в {SaveFile.FullName}");
+
+        XElement? userElement = doc.Root.Element("User");
+        if (userElement is null) { if (elementNullHandler is not null) elementNullHandler("User"); }
+        else _user = new(userElement);
+
+        XElement? contactsElement = doc.Root.Element("Contacts");
+        if (contactsElement is null) { if (elementNullHandler is not null) elementNullHandler("Contacts"); }
+        else
         {
-            serialized = (XMLMessagerExport?)(serializer.Deserialize(fileStream));
+            List<User> contacts = _contacts;
+            try
+            {
+                _contacts.Clear();
+                contactsElement
+                    .Elements("User")
+                    .Select(user => new User(user))
+                    .ToList()
+                    .ForEach(NewContact);
+            }
+            catch (Exception ex) 
+            { 
+                _contacts = contacts;
+                if (elementExceptionHandler is not null) elementExceptionHandler("Contacts", ex);
+            }
         }
 
-        if (serialized == null)
+        XElement? chatsElement = doc.Root.Element("Chats");
+        if (chatsElement is null) { if (elementNullHandler is not null) elementNullHandler("Chats"); }
+        else
         {
-            string reason = SaveFile.Length == 0
-                ? "пуст"
-                : "содержит неверные данные";
-
-            throw new InvalidOperationException($"Файл {SaveFile.Name} {reason}.");
+            List<Chat> chats = _chats;
+            try
+            {
+                _chats.Clear();
+                chatsElement
+                    .Elements("Chat")
+                    .Select(chat => new Chat(chat, Contacts))
+                    .ToList()
+                    .ForEach(AddChat);
+            }
+            catch (Exception ex) 
+            { 
+                _chats = chats;
+                if (elementExceptionHandler is not null) elementExceptionHandler("Chats", ex);
+            }
         }
-
-        _contacts = [];
-        _chats = [];
-
-        _user = serialized.User;
-        serialized.Contacts.ForEach(NewContact);
-        serialized.Chats.ForEach(AddChat);
     }
 }

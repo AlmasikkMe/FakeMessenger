@@ -386,7 +386,7 @@ public static class MessagerConsoleUI
     {
         try
         {
-            Messenger.Load();
+            Messenger.Load(el => Console.WriteLine($"Не удалось найти элемент {el}"), (el, ex) => Console.WriteLine($"Не удалось загрузить элемент {el}: {ex.Message}"));
             Console.WriteLine("Загружено из файла Save.Messager.xml");
         }
         catch (Exception ex)
