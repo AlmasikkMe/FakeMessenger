@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Xml.Linq;
-using System.Xml.Serialization;
+﻿using System.Xml.Linq;
 
 namespace ConsoleFakeChat;
 
@@ -11,8 +9,7 @@ public class User
         Username = username;
         FirstName = firstName;
         LastName = lastName;
-    }
-    public User() : this("@example", "Пользователь") { }
+    }    
     public User(XElement xElement)
     {
         Username = (xElement.Element("Username") ?? throw new InvalidOperationException("Обязательный элемент Username не найден в элементе")).Value;
@@ -48,7 +45,7 @@ public class User
         set => field = value.Trim(); 
     } 
     public string FullName => $"{FirstName} {LastName}".Trim();
-    [XmlIgnore] public Chat Chat 
+    public Chat Chat 
     { 
         get 
         { 
@@ -58,7 +55,7 @@ public class User
                 Chat.AddMembers([Messenger.User, this]);
             } 
             _chat.ChatName = FullName; return _chat; 
-        } 
+        }
         set
         {
             if (value.ChatName == Username) _chat = value;

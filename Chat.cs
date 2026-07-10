@@ -3,10 +3,18 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace ConsoleFakeChat;
-public class Chat(string chatName, string name)
+public class Chat
 {
+    public Chat(string chatName, string name)
+    {
+        ChatName = chatName;
+        Name = name;
+
+        _members = [];
+        _messages = [];
+    }
     public Chat(XElement xElement, List<User> users) : this(xElement, users.AsReadOnly()) { }
-    public Chat(XElement xElement, IReadOnlyList<User> users) : this("@example", "Чат")
+    public Chat(XElement xElement, IReadOnlyList<User> users)
     {
         ChatName = xElement.Element("ChatName")?.Value ?? throw new InvalidOperationException("Обязательный элемент ChatName не найден в элементе Chat");
         Name = xElement.Element("Name")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Name не найден в элементе Chat {ChatName}");
@@ -30,7 +38,7 @@ public class Chat(string chatName, string name)
         if (messagesElement is not null)
         {
             foreach (var message in messagesElement.Elements("Message"))
-{
+            {
                 string senderUsername = message.Element("Sender")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Sender не найден в элементе Message из элемента Chat {ChatName}");
                 User sender = _members.FirstOrDefault(member => member.Username == senderUsername) ?? throw new InvalidOperationException($"Отправитель {senderUsername} не числится в участниках чата {ChatName}");
 
@@ -46,7 +54,6 @@ public class Chat(string chatName, string name)
             } 
             }
     }
-    public Chat() : this("example", "Чат") { }
 
     public string ChatName
     {
@@ -63,17 +70,17 @@ public class Chat(string chatName, string name)
             }
             else throw new ArgumentException("Уникальное имя чата допускает только латинские символы или цифры");
         }
-    } = chatName;
+    }
     public string Name
     {
         get;
         set => field = !value.IsWhiteSpace() ? value.Trim() : throw new ArgumentException("Название чата не может быть пустым");
-    } = name;
-    private List<User> _members = [];
-    private List<Message> _messages = [];
+    }
+    private List<User> _members;
+    private List<Message> _messages;
 
-    [XmlArray("Members")] [XmlArrayItem("Member")]  public List<User> Members { get => _members; }
-    [XmlArray("Messages")] [XmlArrayItem("Message")]  public List<Message> Messages { get => _messages; }
+    public List<User> Members { get => _members; }
+    public List<Message> Messages { get => _messages; }
 
     public XElement ToXElement() =>
         new("Chat",
