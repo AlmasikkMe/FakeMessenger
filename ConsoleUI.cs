@@ -230,7 +230,7 @@ public static class MessagerConsoleUI
     public static void ViewChatHistory(Chat chat)
     {
         Console.Clear();
-        chat.Messages.ForEach(message =>
+        foreach (var message in chat.Messages)
         {
             Console.WriteLine($"{message.Sender}, [{message.DateTime:dd.MM.yyyy HH:mm}]");
             if (message.Type != "text")
@@ -241,7 +241,7 @@ public static class MessagerConsoleUI
             }
             Console.WriteLine(message.Text);
             Console.WriteLine();
-        });
+        }
     }
 
     public static void NewContact()

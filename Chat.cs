@@ -79,8 +79,8 @@ public class Chat
     private List<User> _members;
     private List<Message> _messages;
 
-    public List<User> Members { get => _members; }
-    public List<Message> Messages { get => _messages; }
+    public IReadOnlyList<User> Members => _members.AsReadOnly();
+    public IReadOnlyList<Message> Messages => _messages.AsReadOnly();
 
     public XElement ToXElement() =>
         new("Chat",
@@ -100,7 +100,7 @@ public class Chat
 
     public void AddMembers(List<User> members)
     {
-        Members.AddRange(members.Except(Members).ToList());
+        _members.AddRange(members.Except(_members).ToList());
     }
 
     public void AddMessage(User sender, string? text = null, string? type = null, DateTime? dateTime = null)
