@@ -232,7 +232,7 @@ public static class MessagerConsoleUI
         Console.Clear();
         foreach (var message in chat.Messages)
         {
-            Console.WriteLine($"{message.Sender}, [{message.DateTime:dd.MM.yyyy HH:mm}]");
+            Console.WriteLine($"{message.Sender.FullName}, [{message.DateTime:dd.MM.yyyy HH:mm}]");
             if (message.Type != "text")
             {
                 Console.Write($"[{MessagesTypes[message.Type].Emoji}  ");
