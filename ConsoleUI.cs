@@ -14,7 +14,6 @@ public static class ConsoleUI
         {
             try
             {
-                Console.Clear();
                 Console.WriteLine("Что вы хотите сделать?");
 
                 Console.WriteLine("1. Создать контакт");
@@ -48,6 +47,8 @@ public static class ConsoleUI
                     case "0":
                         return;
                 }
+                if (Console.CursorLeft != 0) Console.WriteLine();
+                Console.WriteLine();
             }
             catch (Exception ex)
             {
@@ -62,9 +63,8 @@ public static class ConsoleUI
         bool inDialog = true;
         while (inDialog)
         {
-            try
+            try 
             {
-                Console.Clear();
                 Console.WriteLine($"Вы в чате {chat.ChatName}");
                 Console.WriteLine("Что вы хотите сделать?");
 
@@ -77,7 +77,7 @@ public static class ConsoleUI
                 {
                     case "1":
                         MessagerConsoleUI.ViewChatHistory(chat);
-                        Console.ReadLine();
+                        Console.ReadKey(true);
                         break;
                     case "2":
                         MessagerConsoleUI.SendTextMessage(chat);
@@ -89,6 +89,9 @@ public static class ConsoleUI
                         inDialog = false;
                         break;
                 }
+
+                if (Console.CursorLeft != 0) Console.WriteLine();
+                Console.WriteLine();
             }
             catch (Exception ex)
             {
@@ -204,10 +207,12 @@ public static class ConsoleUI
                     }
                     else
                     {
+                        Console.Clear();
                         return options[selectIndex];
                     }
                 case ConsoleKey.Escape:
                     Console.CursorVisible = true;
+                    Console.Clear();
                     throw new OperationCanceledException("Отмена выбора");
             }
         }
@@ -237,9 +242,11 @@ public static class MessagerConsoleUI
 
     public static void ViewChatHistory(Chat chat)
     {
-        Console.Clear();
-        foreach (var message in chat.Messages)
+        for (int i = 0; i < chat.Messages.Count; i++)
         {
+            if (i != 0) Console.WriteLine();
+
+            Message? message = chat.Messages[i];
             Console.WriteLine($"{message.Sender.FullName}, [{message.DateTime:dd.MM.yyyy HH:mm}]");
             if (message.Type != "text")
             {
@@ -247,8 +254,7 @@ public static class MessagerConsoleUI
                 if (message.Text == string.Empty) Console.WriteLine($"{MessagesTypes[message.Type].Name}]");
                 else Console.WriteLine($"{message.Text}]");
             }
-            Console.WriteLine(message.Text);
-            Console.WriteLine();
+            if (!message.Text.IsWhiteSpace()) Console.WriteLine(message.Text);
         }
     }
 
@@ -286,7 +292,6 @@ public static class MessagerConsoleUI
             bool isYNDialog = true;
             while (isChooseMembers && isYNDialog)
             {
-                Console.Clear();
                 Console.Write("Продолжить добавление членов группы? (Y/n): ");
                 switch (Console.ReadKey().Key)
                 {
@@ -324,7 +329,6 @@ public static class MessagerConsoleUI
         text = text.Trim();
 
         string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
-        Console.Clear();
 
         DateTime dateTime = DateTime.Now;
         Console.Write("Введите время сообщения: ");
@@ -339,7 +343,6 @@ public static class MessagerConsoleUI
     public static void SendMultimediaMessage(Chat chat)
     {
         string? type = ConsoleUI.SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения");
-        Console.Clear();
 
         string? text = null;
         if (MessagesTypes[type].IsWithText)
@@ -350,7 +353,6 @@ public static class MessagerConsoleUI
         }
 
         string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
-        Console.Clear();
 
         DateTime dateTime = DateTime.Now;
         Console.Write("Введите время сообщения: ");
@@ -387,7 +389,7 @@ public static class MessagerConsoleUI
             Console.WriteLine($"Не удалось сохранить в файл Save.Messager.xml: {ex.ToString()}");
         }
 
-        Console.ReadLine();
+        Console.ReadKey(true);
     }
 
     public static void Load()
@@ -402,6 +404,6 @@ public static class MessagerConsoleUI
             Console.WriteLine($"Не удалось загрузить из файла Save.Messager.xml: {ex.ToString()}");
         }
 
-        Console.ReadLine();
+        Console.ReadKey(true);
     }
 }
