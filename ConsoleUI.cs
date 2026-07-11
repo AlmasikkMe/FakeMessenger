@@ -98,9 +98,11 @@ public static class ConsoleUI
         }
     }
 
-    public static string SearchDialog(Func<string, List<string>> optionsUpdate)
+    public static string SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
     {
-        string instruction = "Напишите для поиска (ESC для выхода): ";
+        bool isHasMessage = !string.IsNullOrWhiteSpace(message);
+
+        string searchInstruction = "Напишите для поиска (ESC для выхода): ";
 
         Console.Clear();
 
@@ -108,11 +110,13 @@ public static class ConsoleUI
         int selectIndex = -1;
         int offset = 0;
 
-        Console.WriteLine(instruction);
+        if (isHasMessage) Console.WriteLine(message);
+
+        Console.WriteLine(searchInstruction);
         string searchText = "";
 
         List<string> options = optionsUpdate(searchText);
-        options.Take(Console.WindowHeight - 2)
+        options.Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
                .ToList()
                .ForEach(option => Console.WriteLine(option));
 
@@ -120,13 +124,13 @@ public static class ConsoleUI
         {
             if (options.Count is 0) throw new ArgumentException("Нет списка для выбора");
 
-            Console.SetCursorPosition(0, selectIndex - offset + 1);
+            Console.SetCursorPosition(0, selectIndex - offset + (isHasMessage ? 2 : 1));
 
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
 
             if (selectIndex != -1) Console.Write(options[selectIndex]);
-            else Console.Write(instruction);
+            else Console.Write(searchInstruction);
 
             Console.ResetColor();
 
@@ -146,9 +150,10 @@ public static class ConsoleUI
                             offset--;
 
                             Console.Clear();
-                            Console.WriteLine(instruction);
+                            if (isHasMessage) Console.WriteLine(message);
+                            Console.WriteLine(searchInstruction);
                             options.Skip(offset)
-                                .Take(Console.WindowHeight - 2)
+                                .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
                                 .ToList()
                                 .ForEach(option => Console.WriteLine(option));
                         }
@@ -160,7 +165,7 @@ public static class ConsoleUI
                     {
                         Console.SetCursorPosition(0, Console.CursorTop);
                         if (selectIndex != -1) Console.Write(options[selectIndex]);
-                        else Console.Write(instruction);
+                        else Console.Write(searchInstruction);
 
                         selectIndex++;
                         if (selectIndex - offset + 1 >= Console.WindowHeight - 1)
@@ -168,9 +173,10 @@ public static class ConsoleUI
                             offset++;
 
                             Console.Clear();
-                            Console.WriteLine(instruction);
+                            if (isHasMessage) Console.WriteLine(message);
+                            Console.WriteLine(searchInstruction);
                             options.Skip(offset)
-                                .Take(Console.WindowHeight - 2)
+                                .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
                                 .ToList()
                                 .ForEach(option => Console.WriteLine(option));
                         }
@@ -183,7 +189,8 @@ public static class ConsoleUI
                     if (selectIndex == -1)
                     {
                         Console.Clear();
-                        Console.Write(instruction);
+                        if (isHasMessage) Console.WriteLine(message);
+                        Console.Write(searchInstruction);
 
                         string? input = Console.ReadLine();
                         if (input == null) Console.WriteLine();
@@ -200,6 +207,7 @@ public static class ConsoleUI
                         return options[selectIndex];
                     }
                 case ConsoleKey.Escape:
+                    Console.CursorVisible = true;
                     throw new OperationCanceledException("Отмена выбора");
             }
         }
@@ -263,15 +271,14 @@ public static class MessagerConsoleUI
         List<User> members = [];
         bool isChooseMembers = true;
 
-        Console.Write("Выберите членов группы (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
         while (isChooseMembers)
         {
             var searchQuery = ConsoleUI.SearchDialog(search =>
                 Messenger.GetContacts(search)
                          .Except(members)
                          .Select(member => member.Username)
-                         .ToList()
-            );
+                         .ToList(),
+            "Выберите членов группы");
 
             User contact = Messenger.Contacts.First(contact => contact.Username == searchQuery);
             members.Add(contact);
@@ -302,7 +309,7 @@ public static class MessagerConsoleUI
 
     public static Chat ChooseChat()
     {
-        string chatName = ConsoleUI.SearchDialog(searchText => Messenger.GetChats(searchText).Select(chat => chat.ChatName).ToList());
+        string chatName = ConsoleUI.SearchDialog(searchText => Messenger.GetChats(searchText).Select(chat => chat.ChatName).ToList(), "Выберите чат");
         return Messenger.GetChats(chatName)[0];
     }
 
@@ -316,8 +323,7 @@ public static class MessagerConsoleUI
         }
         text = text.Trim();
 
-        Console.Write("Выберите отправителя (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
-        string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList());
+        string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
         Console.Clear();
 
         DateTime dateTime = DateTime.Now;
@@ -332,8 +338,7 @@ public static class MessagerConsoleUI
 
     public static void SendMultimediaMessage(Chat chat)
     {
-        Console.Write("Выберите тип сообщения (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
-        string? type = ConsoleUI.SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList());
+        string? type = ConsoleUI.SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения");
         Console.Clear();
 
         string? text = null;
@@ -344,8 +349,7 @@ public static class MessagerConsoleUI
             text = text.Trim();
         }
 
-        Console.Write("Выберите отправителя (Нажмите любую кнопку для продолжения): "); Console.ReadKey();
-        string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList());
+        string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
         Console.Clear();
 
         DateTime dateTime = DateTime.Now;
@@ -361,7 +365,11 @@ public static class MessagerConsoleUI
 
     public static void CreateContactChat()
     {
-        string contactName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search).Where(contact => !contact.IsHasChat).Select(contact => contact.Username).ToList());
+        string contactName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search)
+                                                                                           .Where(contact => !contact.IsHasChat)
+                                                                                           .Select(contact => contact.Username)
+                                                                                           .ToList(),
+                                                                                           "Выберете контакт");
         
         Chat chat = Messenger.GetContacts(contactName).First(contact => contact.Username == contactName).Chat;
         Messenger.AddChat(chat);
