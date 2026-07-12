@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Design;
+using System.Numerics;
 
 namespace ConsoleFakeChat.ConsoleUI;
 public static class ConsoleUI
@@ -69,10 +70,12 @@ public static class ConsoleUI
     public static string SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
     {
         bool isHasMessage = !string.IsNullOrWhiteSpace(message);
+        if (isHasMessage) Console.Write($"{message}: ");
 
         string searchInstruction = "Напишите для поиска (ESC для выхода): ";
 
         Console.Write("\x1b[?1049h"); // Включение альтернативного буфера
+        bool isInAltBuffer = true;
 
         Console.SetCursorPosition(0, 0);
 
@@ -172,7 +175,13 @@ public static class ConsoleUI
                         }
                         else
                         {
-                            return options[selectIndex];
+                            Console.Write("\x1b[?1049l");
+                            isInAltBuffer = false;
+
+                            string selected = options[selectIndex];
+
+                            Console.WriteLine(selected); // Вот это не выводится
+                            return selected;
                         }
                     case ConsoleKey.Escape:
                         throw new OperationCanceledException("Отмена выбора");
@@ -182,8 +191,8 @@ public static class ConsoleUI
         finally
         {
             Console.CursorVisible = true;
-
-            Console.Write("\x1b[?1049l");
+                            
+            if (isInAltBuffer) Console.Write("\x1b[?1049l"); 
         }
     }
 }
