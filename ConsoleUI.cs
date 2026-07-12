@@ -107,114 +107,118 @@ public static class ConsoleUI
 
         string searchInstruction = "Напишите для поиска (ESC для выхода): ";
 
-        Console.Clear();
+        Console.Write("\x1b[?1049h"); // Включение альтернативного буфера
 
-        Console.CursorVisible = false;
-        int selectIndex = -1;
-        int offset = 0;
+        Console.SetCursorPosition(0, 0);
 
-        if (isHasMessage) Console.WriteLine(message);
-
-        Console.WriteLine(searchInstruction);
-        string searchText = "";
-
-        List<string> options = optionsUpdate(searchText);
-        options.Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
-               .ToList()
-               .ForEach(option => Console.WriteLine(option));
-
-        while (true)
+        try
         {
-            if (options.Count is 0) throw new ArgumentException("Нет списка для выбора");
+            Console.CursorVisible = false;
+            int selectIndex = -1;
+            int offset = 0;
 
-            Console.SetCursorPosition(0, selectIndex - offset + (isHasMessage ? 2 : 1));
+            if (isHasMessage) Console.WriteLine(message);
 
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine(searchInstruction);
+            string searchText = "";
 
-            if (selectIndex != -1) Console.Write(options[selectIndex]);
-            else Console.Write(searchInstruction);
+            List<string> options = optionsUpdate(searchText);
+            options.Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
+                   .ToList()
+                   .ForEach(option => Console.WriteLine(option));
 
-            Console.ResetColor();
-
-            ConsoleKeyInfo consoleKey = Console.ReadKey(true);
-
-            switch (consoleKey.Key)
+            while (true)
             {
-                case ConsoleKey.UpArrow:
-                    if (selectIndex > -1)
-                    {
-                        Console.SetCursorPosition(0, Console.CursorTop);
-                        Console.Write(options[selectIndex]);
-                        selectIndex--;
+                if (options.Count is 0) throw new ArgumentException("Нет списка для выбора");
 
-                        if (offset > 0)
+                Console.SetCursorPosition(0, selectIndex - offset + (isHasMessage ? 2 : 1));
+
+                Console.Write("\u001b[30;47m"); // Черный текст на белом фоне
+
+                if (selectIndex != -1) Console.Write(options[selectIndex]);
+                else Console.Write(searchInstruction);
+
+                Console.Write("\u001b[0m"); // Сброс цветов
+
+                ConsoleKeyInfo consoleKey = Console.ReadKey(true);
+
+                switch (consoleKey.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        if (selectIndex > -1)
                         {
-                            offset--;
+                            Console.SetCursorPosition(0, Console.CursorTop);
+                            Console.Write(options[selectIndex]);
+                            selectIndex--;
 
-                            Console.Clear();
-                            if (isHasMessage) Console.WriteLine(message);
-                            Console.WriteLine(searchInstruction);
-                            options.Skip(offset)
-                                .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
-                                .ToList()
-                                .ForEach(option => Console.WriteLine(option));
+                            if (offset > 0)
+                            {
+                                offset--;
+
+                                if (isHasMessage) Console.WriteLine(message);
+                                Console.WriteLine(searchInstruction);
+                                options.Skip(offset)
+                                    .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
+                                    .ToList()
+                                    .ForEach(option => Console.WriteLine(option));
+                            }
                         }
-                    }
-                    break;
-
-                case ConsoleKey.DownArrow:
-                    if (selectIndex < options.Count - 1)
-                    {
-                        Console.SetCursorPosition(0, Console.CursorTop);
-                        if (selectIndex != -1) Console.Write(options[selectIndex]);
-                        else Console.Write(searchInstruction);
-
-                        selectIndex++;
-                        if (selectIndex - offset + 1 >= Console.WindowHeight - 1)
-                        {
-                            offset++;
-
-                            Console.Clear();
-                            if (isHasMessage) Console.WriteLine(message);
-                            Console.WriteLine(searchInstruction);
-                            options.Skip(offset)
-                                .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
-                                .ToList()
-                                .ForEach(option => Console.WriteLine(option));
-                        }
-                    }
-                    break;
-
-                case ConsoleKey.Spacebar:
-                case ConsoleKey.Enter:
-                    Console.CursorVisible = true;
-                    if (selectIndex == -1)
-                    {
-                        Console.Clear();
-                        if (isHasMessage) Console.WriteLine(message);
-                        Console.Write(searchInstruction);
-
-                        string? input = Console.ReadLine();
-                        if (input == null) Console.WriteLine();
-                        searchText = input ?? "";
-
-                        options = optionsUpdate(searchText);
-                        options.ForEach(option => Console.WriteLine(option));
-
-                        Console.CursorVisible = false;
                         break;
-                    }
-                    else
-                    {
-                        Console.Clear();
-                        return options[selectIndex];
-                    }
-                case ConsoleKey.Escape:
-                    Console.CursorVisible = true;
-                    Console.Clear();
-                    throw new OperationCanceledException("Отмена выбора");
+
+                    case ConsoleKey.DownArrow:
+                        if (selectIndex < options.Count - 1)
+                        {
+                            Console.SetCursorPosition(0, Console.CursorTop);
+                            if (selectIndex != -1) Console.Write(options[selectIndex]);
+                            else Console.Write(searchInstruction);
+
+                            selectIndex++;
+                            if (selectIndex - offset + 1 >= Console.WindowHeight - 1)
+                            {
+                                offset++;
+
+                                if (isHasMessage) Console.WriteLine(message);
+                                Console.WriteLine(searchInstruction);
+                                options.Skip(offset)
+                                    .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
+                                    .ToList()
+                                    .ForEach(option => Console.WriteLine(option));
+                            }
+                        }
+                        break;
+
+                    case ConsoleKey.Spacebar:
+                    case ConsoleKey.Enter:
+                        if (selectIndex == -1)
+                        {
+                            if (isHasMessage) Console.WriteLine(message);
+                            Console.Write(searchInstruction);
+
+                            Console.CursorVisible = false;
+                            string? input = Console.ReadLine();
+                            Console.CursorVisible = true;
+
+                            if (input == null) Console.WriteLine();
+                            searchText = input ?? "";
+
+                            options = optionsUpdate(searchText);
+                            options.ForEach(option => Console.WriteLine(option));
+                            break;
+                        }
+                        else
+                        {
+                            return options[selectIndex];
+                        }
+                    case ConsoleKey.Escape:
+                        throw new OperationCanceledException("Отмена выбора");
+                }
             }
+        }
+        finally
+        {
+            Console.CursorVisible = true;
+
+            Console.Write("\x1b[?1049l");
         }
     }
 }
