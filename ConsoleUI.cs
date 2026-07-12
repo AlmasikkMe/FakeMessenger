@@ -276,6 +276,7 @@ public static class MessagerConsoleUI
                     case ConsoleKey.N: isChooseMembers = false; break;
                     case ConsoleKey.Y: isYNDialog = false; break;
                 }
+                Console.WriteLine();
             }
         }
 
