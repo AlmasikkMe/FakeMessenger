@@ -1,4 +1,6 @@
-﻿namespace ConsoleFakeChat.ConsoleUI;
+﻿using System.ComponentModel.Design;
+
+namespace ConsoleFakeChat.ConsoleUI;
 public static class ConsoleUI
 {
     public static void Run()
@@ -8,45 +10,20 @@ public static class ConsoleUI
         MainMenu();
     }
 
-    public static void MainMenu()
+    public static void ShowMenu(string? message, Dictionary<string, Action> menuActions, string exitOption = "Выйти")
     {
-        while (true)
+        bool isInMenu = true;
+        menuActions.Add(exitOption, () => isInMenu = false);
+        while (isInMenu)
         {
             try
             {
-                Console.WriteLine("Что вы хотите сделать?");
+                string selected = SearchDialog(search => menuActions.Keys.Where(option => option.Contains(search)).ToList(), message);
 
-                Console.WriteLine("1. Создать контакт");
-                Console.WriteLine("2. Создать группу");
-                Console.WriteLine("3. Перейти в чат");
-                Console.WriteLine("4. Сохранить");
-                Console.WriteLine("5. Загрузить");
-                Console.WriteLine("6. Создать чат с контактом");
-                Console.WriteLine("0. Выйти");
+                Action selectedAction = menuActions[selected];
 
-                switch (Console.ReadLine())
-                {
-                    case "1":
-                        MessagerConsoleUI.NewContact();
-                        break;
-                    case "2":
-                        MessagerConsoleUI.NewGroup();
-                        break;
-                    case "3":
-                        ChatCommandMenu(MessagerConsoleUI.ChooseChat());
-                        break;
-                    case "4":
-                        MessagerConsoleUI.Save();
-                        break;
-                    case "5":
-                        MessagerConsoleUI.Load();
-                        break;
-                    case "6":
-                        MessagerConsoleUI.CreateContactChat();
-                        break;
-                    case "0":
-                        return;
-                }
+                selectedAction();
+
                 if (Console.CursorLeft != 0) Console.WriteLine();
                 Console.WriteLine();
             }
@@ -58,47 +35,35 @@ public static class ConsoleUI
         }
     }
 
+    public static void MainMenu()
+    {
+        string? message = null;
+
+        Dictionary<string, Action> menuActions = new()
+        {
+            { "Создать контакт", MessagerConsoleUI.NewContact },
+            { "Создать группу", MessagerConsoleUI.NewGroup },
+            { "Перейти в чат", () => ChatCommandMenu(MessagerConsoleUI.ChooseChat()) },
+            { "Сохранить", MessagerConsoleUI.Save },
+            { "Загрузить", MessagerConsoleUI.Load },
+            { "Создать чат с контактом", MessagerConsoleUI.CreateContactChat },
+        };
+
+        ShowMenu(message, menuActions, "Выйти без сохранения");
+    }
+
     public static void ChatCommandMenu(Chat chat)
     {
-        bool inDialog = true;
-        while (inDialog)
+        string message = $"Вы в чате {chat.ChatName}";
+
+        Dictionary<string, Action> menuActions = new()
         {
-            try 
-            {
-                Console.WriteLine($"Вы в чате {chat.ChatName}");
-                Console.WriteLine("Что вы хотите сделать?");
+            { "Отправить сообщение", () => { MessagerConsoleUI.ViewChatHistory(chat); Console.ReadKey(true); } },
+            { "Посмотреть историю чата", () => MessagerConsoleUI.SendTextMessage(chat) },
+            { "Отправить мультимедиа", () => MessagerConsoleUI.SendMultimediaMessage(chat) },
+        };
 
-                Console.WriteLine("1. Посмотреть историю чата");
-                Console.WriteLine("2. Отправить сообщение");
-                Console.WriteLine("3. Отправить мультимедиа");
-                Console.WriteLine("0. Выйти из чата");
-
-                switch (Console.ReadLine())
-                {
-                    case "1":
-                        MessagerConsoleUI.ViewChatHistory(chat);
-                        Console.ReadKey(true);
-                        break;
-                    case "2":
-                        MessagerConsoleUI.SendTextMessage(chat);
-                        break;
-                    case "3":
-                        MessagerConsoleUI.SendMultimediaMessage(chat);
-                        break;
-                    case "0":
-                        inDialog = false;
-                        break;
-                }
-
-                if (Console.CursorLeft != 0) Console.WriteLine();
-                Console.WriteLine();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.ReadLine();
-            }
-        }
+        ShowMenu(message, menuActions, "Выйти из чата");
     }
 
     public static string SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
