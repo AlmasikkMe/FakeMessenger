@@ -54,7 +54,7 @@ public class User
                 _chat = new(Username, FullName);
                 Chat.AddMembers([Messenger.User, this]);
             } 
-            _chat.ChatName = FullName; return _chat; 
+            _chat.Name = FullName; return _chat; 
         }
         set
         {
