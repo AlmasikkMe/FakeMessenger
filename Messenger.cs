@@ -36,8 +36,8 @@ public class Messenger()
 
     public void NewGroup(string chatName, string groupName, List<User> members)
     {
-        if (!members.Contains(User)) 
-            members.Prepend(User);
+        if (!members.Contains(User))
+            members = members.Prepend(User).ToList();
 
         if (chatName.IsWhiteSpace()) 
             chatName = $"@chat{_chats.Count + 1}";
