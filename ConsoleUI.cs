@@ -59,8 +59,8 @@ public static class ConsoleUI
 
         Dictionary<string, Action> menuActions = new()
         {
-            { "Отправить сообщение", () => { MessagerConsoleUI.ViewChatHistory(chat); Console.ReadKey(true); } },
-            { "Посмотреть историю чата", () => MessagerConsoleUI.SendTextMessage(chat) },
+            { "Посмотреть историю чата", () => { MessagerConsoleUI.ViewChatHistory(chat); Console.ReadKey(true); } },
+            { "Отправить сообщение", () => MessagerConsoleUI.SendTextMessage(chat) },
             { "Отправить мультимедиа", () => MessagerConsoleUI.SendMultimediaMessage(chat) },
         };
 
