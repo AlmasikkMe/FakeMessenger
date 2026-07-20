@@ -267,6 +267,8 @@ public static class MessagerConsoleUI
             User contact = Messenger.Contacts.First(contact => contact.Username == searchQuery);
             members.Add(contact);
 
+            if (Messenger.Contacts.Count == members.Count) isChooseMembers = false;
+
             bool isYNDialog = true;
             while (isChooseMembers && isYNDialog)
             {
