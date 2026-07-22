@@ -45,31 +45,10 @@ public class User
         set => field = value.Trim(); 
     } 
     public string FullName => $"{FirstName} {LastName}".Trim();
-    public Chat Chat 
-    { 
-        get 
-        { 
-            if (_chat == null)
-            { 
-                _chat = new(Username, FullName);
-                Chat.AddMembers([Messenger.User, this]);
-            } 
-            _chat.Name = FullName; return _chat; 
-        }
-        set
-        {
-            if (value.ChatName == Username) _chat = value;
-            else throw new ArgumentException("Уникальное имя чата должно соответствовать имени пользователя");
-        }
-    }
-    private Chat? _chat = null;
-    public bool IsHasChat => !(_chat == null);
-
     public XElement ToXElement() =>
         new ("User",
             new XElement("Username", Username),
             new XElement("FirstName", FirstName),
-            new XElement("LastName", LastName),
-            new XElement("IsHasChat", IsHasChat)
+            new XElement("LastName", LastName)
             );
 }
