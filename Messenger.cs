@@ -140,7 +140,7 @@ public class Messenger()
                 _chats.Clear();
                 chatsElement
                     .Elements("Chat")
-                    .Select(chat => new Chat(chat, Contacts))
+                    .Select(chat => new Chat(chat, Contacts.Append(User).ToList()))
                     .ToList()
                     .ForEach(AddChat);
             }
