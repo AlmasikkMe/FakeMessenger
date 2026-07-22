@@ -20,34 +20,18 @@
 - Сохранения: `XML-файл` через `XDocument`
 
 ## Установка и запуск
-
-1. Убедитесь в наличии .NET 10 или скачайте его на [официальном сайте Microsoft](https://dotnet.microsoft.com/ru-ru/download/dotnet/10.0)
-
-2. Скачайте файлы проекта и перейдите в папку проекта:
-
-- Через клонирование репозитория:
-``` bash
-git clone https://github.com/AlmasikkMe/FakeMessenger.git
-cd FakeMessenger
-```
-
-- [Или скачайте и распакуйте ZIP-архив](https://github.com/AlmasikkMe/FakeMessenger/archive/refs/heads/master.zip) и откройте терминал в этой папке
-
-3. Соберите проект:  
-``` bash
-dotnet build
-```
-
-4. Запустите приложение:  
-
-- Через скомпилированный файл напрямую:
-   - **Windows:** `FakeMessenger/bin/Debug/net10.0/ConsoleFakeChat.exe`
-   - **macOS / Linux:** `FakeMessenger/bin/Debug/net10.0/ConsoleFakeChat`
-
-- Или через терминал:
-``` bash
-dotnet run
-```
+> [!WARNING]
+> Рекомендуется использовать только официальные релизы. Сборки из GitHub Actions могут быть нестабильными.
+1. **Перейдите в [последний релиз](https://github.com/AlmasikkMe/FakeMessenger/releases/latest)** или в последний workflow в [GitHub Actions](https://github.com/AlmasikkMe/FakeMessenger/actions/workflows/dotnet-desktop.yml)
+2. **Скачайте файл запуска** для вашей OS
+3. **Поместите** скачанный файл **в любую папку**
+4. **Разрешите запуск:**
+   - **Для Windows:** `ПКМ по файлу -> Свойства -> Разблокировать -> Применить`
+   - **Для Linux:**
+      ```bash
+      chmod +x ConsoleFakeChat
+      ```
+5. **Запустите файл**
 
 ## Использование
 
