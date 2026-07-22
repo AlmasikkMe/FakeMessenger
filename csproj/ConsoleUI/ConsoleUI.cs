@@ -4,6 +4,7 @@ using System.Numerics;
 namespace FakeMessenger.ConsoleUI;
 public static class ConsoleUI
 {
+    public const string ExitCommand = "/";
     public static void Run()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
