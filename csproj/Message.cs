@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace ConsoleFakeChat;
+namespace FakeMessenger;
 
 public class Message(User sender)
 {
