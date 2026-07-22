@@ -163,30 +163,16 @@ public static class MessengerConsoleUI
 
     public static void Save()
     {
-        try
-        {
-            Messenger.Save();
-            Console.WriteLine($"Сохранено в файл {Messenger.SaveFile}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Не удалось сохранить в файл {Messenger.SaveFile}: {ex.ToString()}");
-        }
+        Messenger.Save();
+        Console.WriteLine($"Сохранено в файл {Messenger.SaveFile}");
 
         Console.ReadKey(true);
     }
 
     public static void Load()
     {
-        try
-        {
-            Messenger.Load(el => Console.WriteLine($"Не удалось найти элемент {el}"), (el, ex) => Console.WriteLine($"Не удалось загрузить элемент {el}: {ex.Message}"));
-            Console.WriteLine("Загружено из xml файла");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Не удалось загрузить из xml файла: {ex.ToString()}");
-        }
+        Messenger.Load(el => Console.WriteLine($"Не удалось найти элемент {el}"), (el, ex) => Console.WriteLine($"Не удалось загрузить элемент {el}: {ex.Message}"));
+        Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);
     }
