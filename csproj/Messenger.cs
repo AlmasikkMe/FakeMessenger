@@ -6,7 +6,8 @@ public class Messenger()
 {
     public static User User => _user;
     private static User _user = new("@FakeChat", "Вы");
-    public FileInfo SaveFile { get; set; } = new("Save.Messager.xml");
+    public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
+    public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
     public IReadOnlyList<User> Contacts => _contacts.AsReadOnly();
     private List<User> _contacts = [];
     public IReadOnlyList<Chat> Chats => _chats.AsReadOnly();
@@ -101,6 +102,12 @@ public class Messenger()
 
     public void Load(Action<string>? elementNullHandler = null, Action<string, Exception>? elementExceptionHandler = null)
     {
+        if (!SaveFile.Exists)
+        {
+            if (OldSaveFiles.Any(file => file.Exists)) RenameOldFile();
+            else throw new InvalidOperationException("Файлы сохранения не найдены");
+        }
+
         XDocument doc = XDocument.Load(SaveFile.FullName);
 
         if (doc.Root is null) throw new InvalidOperationException($"Не удалось получить корневой элемент в {SaveFile.FullName}");
@@ -150,5 +157,22 @@ public class Messenger()
                 if (elementExceptionHandler is not null) elementExceptionHandler("Chats", ex);
             }
         }
+    }
+
+    public void RenameOldFile()
+    {
+        if (SaveFile.Exists) throw new InvalidOperationException("Файл сохранения уже существует");
+
+        foreach (var file in OldSaveFiles)
+        {
+            if (file.Exists)
+            {
+                File.Copy(file.FullName, SaveFile.FullName);
+                File.Delete(file.FullName);
+                return;
+            }
+        }
+
+        throw new InvalidOperationException("Нет файлов для восстановления");
     }
 }
