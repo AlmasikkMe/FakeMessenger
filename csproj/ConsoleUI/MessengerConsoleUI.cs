@@ -151,13 +151,15 @@ public static class MessengerConsoleUI
 
     public static void CreateContactChat()
     {
-        string contactName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search)
-                                                                                           .Where(contact => !contact.IsHasChat)
-                                                                                           .Select(contact => contact.Username)
-                                                                                           .ToList(),
-                                                                                           "Выберете контакт");
-        
-        Chat chat = Messenger.GetContacts(contactName).First(contact => contact.Username == contactName).Chat;
+        string userName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search)
+                                                                       .Where(contact => !Messenger.Contacts.Contains(contact))
+                                                                       .Select(contact => contact.Username)
+                                                                       .ToList(),
+                                                                       "Выберете контакт");
+
+        User contact = Messenger.Contacts.First(user => user.Username == userName);
+
+        Chat chat = new(contact.Username, contact.FullName);
         Messenger.AddChat(chat);
     }
 
