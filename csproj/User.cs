@@ -47,8 +47,8 @@ public class User
     public string FullName => $"{FirstName} {LastName}".Trim();
     public XElement ToXElement() =>
         new ("User",
-            new XElement("Username", Username),
-            new XElement("FirstName", FirstName),
-            new XElement("LastName", LastName)
+            new XAttribute("Username", Username),
+            new XAttribute("FirstName", FirstName),
+            new XAttribute("LastName", LastName)
             );
 }

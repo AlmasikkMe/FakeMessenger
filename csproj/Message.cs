@@ -11,10 +11,9 @@ public class Message(User sender)
 
     public XElement ToXElement() =>
         new("Message",
-            new XElement("Sender", Sender.Username),
-            new XElement("Text", Text),
-            new XElement("Type", Type),
-            new XElement("DateTime", DateTime)
-            );
+            new XAttribute("Sender", Sender.Username),
+            new XAttribute("Type", Type),
+            new XAttribute("DateTime", DateTime),
+            Text);
 
 }

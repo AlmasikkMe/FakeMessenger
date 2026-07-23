@@ -84,8 +84,8 @@ public class Chat
 
     public XElement ToXElement() =>
         new("Chat",
-            new XElement("ChatName", ChatName),
-            new XElement("Name", Name),
+            new XAttribute("ChatName", ChatName),
+            new XAttribute("Name", Name),
             new XElement("Members", from member in _members select new XElement("User", member.Username)),
             new XElement("Messages", from message in _messages select message.ToXElement())
             );
