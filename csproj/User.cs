@@ -12,9 +12,9 @@ public class User
     }    
     public User(XElement xElement)
     {
-        Username = (xElement.Element("Username") ?? throw new InvalidOperationException("Обязательный элемент Username не найден в элементе")).Value;
-        FirstName = (xElement.Element("FirstName") ?? throw new InvalidOperationException("Обязательный элемент FirstName не найден в элементе")).Value;
-        XElement? lastNameElement = xElement.Element("LastName");
+        Username = xElement.Attribute("Username")?.Value ?? throw new InvalidOperationException("Обязательный элемент Username не найден в элементе");
+        FirstName = xElement.Attribute("FirstName")?.Value ?? throw new InvalidOperationException("Обязательный элемент FirstName не найден в элементе");
+        XAttribute? lastNameElement = xElement.Attribute("LastName");
         LastName = lastNameElement is null ? "" : lastNameElement.Value;
     }
 

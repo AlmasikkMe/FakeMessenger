@@ -16,8 +16,8 @@ public class Chat
     public Chat(XElement xElement, List<User> users) : this(xElement, users.AsReadOnly()) { }
     public Chat(XElement xElement, IReadOnlyList<User> users)
     {
-        ChatName = xElement.Element("ChatName")?.Value ?? throw new InvalidOperationException("Обязательный элемент ChatName не найден в элементе Chat");
-        Name = xElement.Element("Name")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Name не найден в элементе Chat {ChatName}");
+        ChatName = xElement.Attribute("ChatName")?.Value ?? throw new InvalidOperationException("Обязательный элемент ChatName не найден в элементе Chat");
+        Name = xElement.Attribute("Name")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Name не найден в элементе Chat {ChatName}");
 
         _members = [];
         XElement membersElement = xElement.Element("Members") ?? throw new InvalidOperationException($"Обязательный элемент Members не найден в элементе Chat {ChatName}");
@@ -39,13 +39,13 @@ public class Chat
         {
             foreach (var message in messagesElement.Elements("Message"))
             {
-                string senderUsername = message.Element("Sender")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Sender не найден в элементе Message из элемента Chat {ChatName}");
+                string senderUsername = message.Attribute("Sender")?.Value ?? throw new InvalidOperationException($"Обязательный элемент Sender не найден в элементе Message из элемента Chat {ChatName}");
                 User sender = _members.FirstOrDefault(member => member.Username == senderUsername) ?? throw new InvalidOperationException($"Отправитель {senderUsername} не числится в участниках чата {ChatName}");
 
-                string? text = message.Element("Text")?.Value.Trim();
-                string? type = message.Element("Type")?.Value.Trim();
+                string? text = message.Value.Trim();
+                string? type = message.Attribute("Type")?.Value.Trim();
 
-                string dateTimeValue = (message.Element("DateTime") ?? throw new InvalidOperationException($"Обязательный элемент DateTime не найден в элементе Message из элемента Chat {ChatName}")).Value;
+                string dateTimeValue = (message.Attribute("DateTime") ?? throw new InvalidOperationException($"Обязательный элемент DateTime не найден в элементе Message из элемента Chat {ChatName}")).Value;
                 if (dateTimeValue.IsWhiteSpace()) throw new InvalidOperationException($"Пустой элемент DateTime в элементе Message из элемента Chat {ChatName}");
                 DateTime dateTime;
                 if (!DateTime.TryParse(dateTimeValue, out dateTime)) throw new InvalidOperationException($"Неудачный парсинг элемента DateTime в элементе Message из элемента Chat {ChatName}");
