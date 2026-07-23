@@ -3,12 +3,10 @@ using System.Xml.Linq;
 
 namespace FakeMessenger;
 
-public class Messenger()
+public class Messenger(User? user = null)
 {
-    public static User User => _user;
-    private static User _user = new("@FakeChat", "Вы");
-    public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
-    public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
+    public User User => _user;
+    private User _user = user ?? new("@FakeChat", "Вы");
     public IReadOnlyList<User> Contacts => _contacts.AsReadOnly();
     private List<User> _contacts = [];
     public IReadOnlyList<Chat> Chats => _chats.AsReadOnly();
@@ -86,94 +84,5 @@ public class Messenger()
             throw new ArgumentException($"Чат {chat.ChatName} уже существует");
         
         _chats.Add(chat);
-    }
-
-    public void Save()
-    {
-        XDocument doc = new(
-            new XElement("Messenger",
-                User.ToXElement(),
-                new XElement("Contacts", from user in _contacts select user.ToXElement()),
-                new XElement("Chats", from chat in _chats select chat.ToXElement())
-                )
-            );
-
-        doc.Save(SaveFile.FullName);
-    }
-
-    public void Load(Action<string>? elementNullHandler = null, Action<string, Exception>? elementExceptionHandler = null)
-    {
-        if (!SaveFile.Exists)
-        {
-            if (OldSaveFiles.Any(file => file.Exists)) RenameOldFile();
-            else throw new InvalidOperationException("Файлы сохранения не найдены");
-        }
-
-        XDocument doc = XDocument.Load(SaveFile.FullName);
-
-        if (doc.Root is null) throw new InvalidOperationException($"Не удалось получить корневой элемент в {SaveFile.FullName}");
-
-        XElement? userElement = doc.Root.Element("User");
-        if (userElement is null) { if (elementNullHandler is not null) elementNullHandler("User"); }
-        else _user = new(userElement);
-
-        XElement? contactsElement = doc.Root.Element("Contacts");
-        if (contactsElement is null) { if (elementNullHandler is not null) elementNullHandler("Contacts"); }
-        else
-        {
-            List<User> contacts = _contacts;
-            try
-            {
-                _contacts.Clear();
-                contactsElement
-                    .Elements("User")
-                    .Select(user => new User(user))
-                    .ToList()
-                    .ForEach(NewContact);
-            }
-            catch (Exception ex) 
-            { 
-                _contacts = contacts;
-                if (elementExceptionHandler is not null) elementExceptionHandler("Contacts", ex);
-            }
-        }
-
-        XElement? chatsElement = doc.Root.Element("Chats");
-        if (chatsElement is null) { if (elementNullHandler is not null) elementNullHandler("Chats"); }
-        else
-        {
-            List<Chat> chats = _chats;
-            try
-            {
-                _chats.Clear();
-                chatsElement
-                    .Elements("Chat")
-                    .Select(chat => new Chat(chat, Contacts.Append(User).ToList()))
-                    .ToList()
-                    .ForEach(AddChat);
-            }
-            catch (Exception ex) 
-            { 
-                _chats = chats;
-                if (elementExceptionHandler is not null) elementExceptionHandler("Chats", ex);
-            }
-        }
-    }
-
-    public void RenameOldFile()
-    {
-        if (SaveFile.Exists) throw new InvalidOperationException("Файл сохранения уже существует");
-
-        foreach (var file in OldSaveFiles)
-        {
-            if (file.Exists)
-            {
-                File.Copy(file.FullName, SaveFile.FullName);
-                File.Delete(file.FullName);
-                return;
-            }
-        }
-
-        throw new InvalidOperationException("Нет файлов для восстановления");
     }
 }
