@@ -1,14 +1,39 @@
-﻿using System.Xml.Linq;
+﻿using System.Reflection;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FakeMessenger;
 public static class MessengerXmlSerializer
 {
-    public static XDocument Serialize(Messenger messenger) => 
+    public static XDocument SerializeMessenger(Messenger messenger) => 
         new(new XElement("Messenger",
-            messenger.User.ToXElement(),
-            new XElement("Contacts", from user in messenger.Contacts select user.ToXElement()),
-            new XElement("Chats", from chat in messenger.Chats select chat.ToXElement())
+            SerializeUser(messenger.User),
+            new XElement("Contacts", from u in messenger.Contacts select SerializeUser(u)),
+            new XElement("Chats", from c in messenger.Chats select SerializeChat(c))
             ));
+
+    public static XElement SerializeUser(User user) =>
+        new ("User",
+            new XAttribute("Username", user.Username),
+            new XAttribute("FirstName", user.FirstName),
+            new XAttribute("LastName", user.LastName)
+            );
+    
+    public static XElement SerializeChat(Chat chat) =>
+        new("Chat",
+            new XAttribute("ChatName", chat.ChatName),
+            new XAttribute("Name", chat.Name),
+            new XElement("Members", from m in chat.Members select new XElement("User", m.Username)),
+            new XElement("Messages", from m in chat.Messages select SerializeMessage(m))
+            );
+
+    public static XElement SerializeMessage(Message message) =>
+        new("Message",
+            new XAttribute("Sender", message.Sender.Username),
+            new XAttribute("Type", message.Type),
+            new XAttribute("DateTime", message.DateTime),
+            message.Text
+            );
 
     private static InvalidOperationException DeserializeFailed(string element, IEnumerable<string> locations) =>
         new($"Не найден обязательный элемент {element} в {string.Join(" - ", locations)}");

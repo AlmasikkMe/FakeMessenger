@@ -38,10 +38,4 @@ public class User
         set => field = value.Trim(); 
     } 
     public string FullName => $"{FirstName} {LastName}".Trim();
-    public XElement ToXElement() =>
-        new ("User",
-            new XAttribute("Username", Username),
-            new XAttribute("FirstName", FirstName),
-            new XAttribute("LastName", LastName)
-            );
 }

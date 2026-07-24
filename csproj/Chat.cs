@@ -41,14 +41,6 @@ public class Chat
     public IReadOnlyList<User> Members => _members.AsReadOnly();
     public IReadOnlyList<Message> Messages => _messages.AsReadOnly();
 
-    public XElement ToXElement() =>
-        new("Chat",
-            new XAttribute("ChatName", ChatName),
-            new XAttribute("Name", Name),
-            new XElement("Members", from member in _members select new XElement("User", member.Username)),
-            new XElement("Messages", from message in _messages select message.ToXElement())
-            );
-
     public List<User> GetMembers(string search = "")
     {
         return (from member in Members
