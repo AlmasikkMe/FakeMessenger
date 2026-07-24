@@ -9,13 +9,6 @@ public class User
         Username = username;
         FirstName = firstName;
         LastName = lastName;
-    }    
-    public User(XElement xElement)
-    {
-        Username = xElement.Attribute("Username")?.Value ?? throw new InvalidOperationException("Обязательный элемент Username не найден в элементе");
-        FirstName = xElement.Attribute("FirstName")?.Value ?? throw new InvalidOperationException("Обязательный элемент FirstName не найден в элементе");
-        XAttribute? lastNameElement = xElement.Attribute("LastName");
-        LastName = lastNameElement is null ? "" : lastNameElement.Value;
     }
 
     public string Username

@@ -192,15 +192,15 @@ public static class MessengerConsoleUI
 
     public static void Save()
     {
-        MessengerXmlSerializer.SerializeAndSave(Messenger);
-        Console.WriteLine($"Сохранено в файл {MessengerXmlSerializer.SaveFile}");
+        MessengerXmlLoader.SerializeAndSave(Messenger);
+        Console.WriteLine($"Сохранено в файл {MessengerXmlLoader.SaveFile}");
 
         Console.ReadKey(true);
     }
 
     public static void Load()
     {
-        Messenger = MessengerXmlSerializer.Deserialize();
+        Messenger = MessengerXmlLoader.DeserializeMessenger();
         Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);
