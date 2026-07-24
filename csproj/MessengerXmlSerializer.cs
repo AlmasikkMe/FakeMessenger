@@ -1,47 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace FakeMessenger;
 public static class MessengerXmlSerializer
 {
     public static List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
     public static FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
-    public static void SerializeAndSave(Messenger messenger)
-    {
-        XDocument doc = new(
-            new XElement("Messenger",
-                messenger.User.ToXElement(),
-                new XElement("Contacts", from user in messenger.Contacts select user.ToXElement()),
-                new XElement("Chats", from chat in messenger.Chats select chat.ToXElement())
-                )
-            );
+    public static void SerializeAndSave(Messenger messenger) => Serialize(messenger).Save(SaveFile.FullName);
 
-        doc.Save(SaveFile.FullName);
-    }
+    public static XDocument Serialize(Messenger messenger) => 
+        new(new XElement("Messenger",
+            messenger.User.ToXElement(),
+            new XElement("Contacts", from user in messenger.Contacts select user.ToXElement()),
+            new XElement("Chats", from chat in messenger.Chats select chat.ToXElement())
+            ));
 
-    private static InvalidOperationException LoadFailed(string element, string location) => new($"Не найден обязательный элемент {element} в {location}");
+    private static InvalidOperationException DeserializeFailed(string element, string location) => new($"Не найден обязательный элемент {element} в {location}");
 
-    public static Messenger DeserializeMessenger()
+    public static Messenger LoadAndDeserializeMessenger() => DeserializeMessenger(XDocument.Load(SaveFile.FullName));
+
+    public static Messenger DeserializeMessenger(XDocument doc)
     {
         User user;
         List<User> contacts;
         List<Chat> chats;
 
-        XDocument doc = XDocument.Load(SaveFile.FullName);
-
         if (doc.Root is null) throw new InvalidOperationException($"Не удалось получить корневой элемент в {SaveFile.FullName}");
 
-        XElement userElement = doc.Root.Element("User") ?? throw LoadFailed("User", SaveFile.FullName);
+        XElement userElement = doc.Root.Element("User") ?? throw DeserializeFailed("User", SaveFile.FullName);
         user = DeserializeUser(userElement);
 
-        XElement contactsElement = doc.Root.Element("Contacts") ?? throw LoadFailed("Contacts", SaveFile.FullName);
+        XElement contactsElement = doc.Root.Element("Contacts") ?? throw DeserializeFailed("Contacts", SaveFile.FullName);
         contacts = contactsElement.Elements("User")
                                     .Select(DeserializeUser)
                                     .ToList();
 
-        XElement chatsElement = doc.Root.Element("Chats") ?? throw LoadFailed("Chats", SaveFile.FullName);
+        XElement chatsElement = doc.Root.Element("Chats") ?? throw DeserializeFailed("Chats", SaveFile.FullName);
         chats = chatsElement.Elements("Chat")
                             .Select(chat => DeserializeChat(chat, contacts.Prepend(user).ToList()))
                             .ToList();
@@ -73,23 +66,22 @@ public static class MessengerXmlSerializer
 
     public static User DeserializeUser(XElement xElement)
     {
-        string username = xElement.Attribute("Username")?.Value ?? throw LoadFailed("Username", "User");
-        string firstName = xElement.Attribute("FirstName")?.Value ?? throw LoadFailed("FirstName", $"User ({username})");
+        string username = xElement.Attribute("Username")?.Value ?? throw DeserializeFailed("Username", "User");
+        string firstName = xElement.Attribute("FirstName")?.Value ?? throw DeserializeFailed("FirstName", $"User ({username})");
         string lastName = xElement.Attribute("LastName")?.Value ?? "";
 
         return new(username, firstName, lastName);
     }
 
     public static Chat DeserializeChat(XElement xElement, List<User> users) => DeserializeChat(xElement, users.AsReadOnly());
-
     public static Chat DeserializeChat(XElement xElement, IReadOnlyList<User> users)
     {
-        string chatName = xElement.Attribute("ChatName")?.Value ?? throw LoadFailed("ChatName", "Chat");
-        string name = xElement.Attribute("Name")?.Value ?? throw LoadFailed("Name", $"Chat ({chatName})");
+        string chatName = xElement.Attribute("ChatName")?.Value ?? throw DeserializeFailed("ChatName", "Chat");
+        string name = xElement.Attribute("Name")?.Value ?? throw DeserializeFailed("Name", $"Chat ({chatName})");
 
         Chat chat = new(chatName, name);
 
-        XElement membersElement = xElement.Element("Members") ?? throw LoadFailed("Members", $"Chat ({chatName})");
+        XElement membersElement = xElement.Element("Members") ?? throw DeserializeFailed("Members", $"Chat ({chatName})");
         List<string> membersUsernames = membersElement
             .Elements("User")
             .Select(member => member.Value)
@@ -114,14 +106,14 @@ public static class MessengerXmlSerializer
     public static Message DeserializeMessage(XElement messageElement, List<User> chatMembers) => DeserializeMessage(messageElement, chatMembers.AsReadOnly());
     public static Message DeserializeMessage(XElement messageElement, IReadOnlyList<User> chatMembers)
     {
-        string senderUsername = messageElement.Attribute("Sender")?.Value ?? throw LoadFailed("Sender", $"Message");
+        string senderUsername = messageElement.Attribute("Sender")?.Value ?? throw DeserializeFailed("Sender", $"Message");
         User sender = chatMembers.FirstOrDefault(member => member.Username == senderUsername) ??
             throw new InvalidOperationException($"Отправитель {senderUsername} не числится в участниках чата");
 
         string? text = messageElement.Value.Trim();
-        string type = messageElement.Attribute("Type")?.Value ?? throw LoadFailed("Type", "Message");
+        string type = messageElement.Attribute("Type")?.Value ?? throw DeserializeFailed("Type", "Message");
 
-        string dateTimeValue = messageElement.Attribute("DateTime")?.Value ?? throw LoadFailed("DateTime", $"Message");
+        string dateTimeValue = messageElement.Attribute("DateTime")?.Value ?? throw DeserializeFailed("DateTime", $"Message");
         if (dateTimeValue.IsWhiteSpace()) 
             throw new InvalidOperationException($"Пустой элемент DateTime в элементе Message");
 
