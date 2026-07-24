@@ -20,6 +20,7 @@ public static class MessengerConsoleUI
     };
 
     public static Messenger Messenger = new();
+    public static MessengerXmlFileRepository MessengerXmlFileRepository = new();
 
     public static void ViewChatHistory(Chat chat)
     {
@@ -192,15 +193,15 @@ public static class MessengerConsoleUI
 
     public static void Save()
     {
-        MessengerXmlSerializer.SerializeAndSave(Messenger);
-        Console.WriteLine($"Сохранено в файл {MessengerXmlSerializer.SaveFile}");
+        MessengerXmlFileRepository.Save(Messenger);
+        Console.WriteLine($"Сохранено в файл {MessengerXmlFileRepository.SaveFile}");
 
         Console.ReadKey(true);
     }
 
     public static void Load()
     {
-        Messenger = MessengerXmlSerializer.LoadAndDeserializeMessenger();
+        Messenger = MessengerXmlFileRepository.Load();
         Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);
