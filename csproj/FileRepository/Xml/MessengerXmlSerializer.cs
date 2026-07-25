@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace FakeMessenger;
+namespace FakeMessenger.FileRepository.Xml;
 public static class MessengerXmlSerializer
 {
     public static XDocument SerializeMessenger(Messenger messenger) => 

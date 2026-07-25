@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace FakeMessenger;
+namespace FakeMessenger.FileRepository.Xml;
 public class MessengerXmlFileRepository
 {
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];

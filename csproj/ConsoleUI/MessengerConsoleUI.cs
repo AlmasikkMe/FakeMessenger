@@ -1,4 +1,6 @@
-﻿namespace FakeMessenger.ConsoleUI;
+﻿using FakeMessenger.FileRepository.Xml;
+
+namespace FakeMessenger.ConsoleUI;
 
 public static class MessengerConsoleUI
 {
