@@ -5,8 +5,13 @@ public class MessengerXmlFileRepository
 {
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
     public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
-    public void Save(Messenger messenger) => MessengerXmlSerializer.Serialize(messenger).Save(SaveFile.FullName);
-    public Messenger Load() => MessengerXmlSerializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), [SaveFile.FullName]);
+    public void Save(Messenger messenger) => MessengerXmlSerializer.SerializeMessenger(messenger).Save(SaveFile.FullName);
+    public Messenger Load()
+    {
+        if (!SaveFile.Exists) RenameOldFile();
+
+        return MessengerXmlSerializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), [SaveFile.FullName]);
+    }
     public void RenameOldFile()
     {
         if (SaveFile.Exists) throw new InvalidOperationException("Файл сохранения уже существует");
