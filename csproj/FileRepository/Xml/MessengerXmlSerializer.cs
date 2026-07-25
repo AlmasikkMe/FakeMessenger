@@ -66,7 +66,7 @@ public static class MessengerXmlSerializer
         contacts.ForEach(messenger.NewContact);
         chats.ForEach(messenger.AddChat);
 
-        return new(user);
+        return messenger;
     }
 
     public static User DeserializeUser(XElement xElement, IEnumerable<string> locations)
@@ -76,9 +76,11 @@ public static class MessengerXmlSerializer
                        ?? throw DeserializeFailed("Username", locations.Append("User"));
 
         string firstName = xElement.Attribute("FirstName")?.Value
+                        ?? xElement.Element("FirstName")?.Value
                         ?? throw DeserializeFailed("FirstName", locations.Append($"User ({username})"));
 
         string lastName = xElement.Attribute("LastName")?.Value
+                       ?? xElement.Element("LastName")?.Value
                        ?? xElement.Element("LastName")?.Value ?? "";
 
         return new(username, firstName, lastName);
