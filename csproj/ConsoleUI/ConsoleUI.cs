@@ -23,7 +23,7 @@ public class ConsoleUI(Messenger messenger)
     };
 
     private Messenger _messenger = messenger;
-    public MessengerXmlFileRepository MessengerXmlFileRepository = new();
+    public MessengerXmlFileRepository MessengerXmlFileRepository = new(new());
 
     public string ExitCommand = "/";
     public void Run()
