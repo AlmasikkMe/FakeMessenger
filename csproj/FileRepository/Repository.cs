@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace FakeMessenger.FileRepository
 {
-    abstract public class MessengerFileRepository
+    abstract public class Repository
     {
         abstract public FileInfo SaveFile { get; set; }
         abstract public void Save(Messenger messenger);

@@ -2,9 +2,9 @@
 using FakeMessenger.ConsoleUI;
 using FakeMessenger.FileRepository.Xml;
 
-MessengerXmlSerializer xmlSerializer = new();
+XmlSerializer xmlSerializer = new();
 
-MessengerXmlFileRepository xmlFileRepository = new(xmlSerializer);
+XmlFileRepository xmlFileRepository = new(xmlSerializer);
 
 Messenger messenger = new(xmlFileRepository);
 

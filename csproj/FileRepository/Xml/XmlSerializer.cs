@@ -4,7 +4,7 @@ using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace FakeMessenger.FileRepository.Xml;
-public class MessengerXmlSerializer
+public class XmlSerializer
 {
     public XDocument SerializeMessenger(Messenger messenger) => 
         new(new XElement("_messenger",
@@ -46,7 +46,7 @@ public class MessengerXmlSerializer
         xElement.Element(name)?.Value ??
         throw DeserializeFailed(name, location);
 
-    public Messenger DeserializeMessenger(XDocument doc, MessengerFileRepository fileRepository, IEnumerable<string> locations)
+    public Messenger DeserializeMessenger(XDocument doc, Repository fileRepository, IEnumerable<string> locations)
     {
         User user;
         List<User> contacts;

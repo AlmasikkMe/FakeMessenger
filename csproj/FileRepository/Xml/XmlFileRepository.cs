@@ -1,9 +1,9 @@
 ﻿using System.Xml.Linq;
 
 namespace FakeMessenger.FileRepository.Xml;
-public class MessengerXmlFileRepository(MessengerXmlSerializer serializer) : MessengerFileRepository
+public class XmlFileRepository(XmlSerializer serializer) : Repository
 {
-    private MessengerXmlSerializer Serializer { get; set; } = serializer;
+    private XmlSerializer Serializer { get; set; } = serializer;
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
     override public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
     override public void Save(Messenger messenger) => Serializer.SerializeMessenger(messenger).Save(SaveFile.FullName);

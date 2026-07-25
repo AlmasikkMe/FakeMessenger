@@ -4,9 +4,9 @@ using System.Xml.Linq;
 
 namespace FakeMessenger;
 
-public class Messenger(MessengerFileRepository fileRepository, User? user = null)
+public class Messenger(Repository fileRepository, User? user = null)
 {
-    private MessengerFileRepository _fileRepository = fileRepository;
+    private Repository _fileRepository = fileRepository;
     public User User => _user;
     private User _user = user ?? new("@FakeChat", "Вы");
     public IReadOnlyList<User> Contacts => _contacts.AsReadOnly();
