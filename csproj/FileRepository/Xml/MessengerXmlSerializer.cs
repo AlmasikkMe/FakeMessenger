@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Xml;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -40,6 +41,11 @@ public static class MessengerXmlSerializer
     private static InvalidOperationException DeserializeFailed(string element, IEnumerable<string> locations) =>
         new($"Не найден обязательный элемент {element} в {string.Join(" - ", locations)}");
 
+    private static string GetAttributeOrElementValue(XElement xElement, string name, IEnumerable<string> location) =>
+        xElement.Attribute(name)?.Value ??
+        xElement.Element(name)?.Value ??
+        throw DeserializeFailed(name, location);
+
     public static Messenger DeserializeMessenger(XDocument doc, IEnumerable<string> locations)
     {
         User user;
@@ -71,17 +77,13 @@ public static class MessengerXmlSerializer
 
     public static User DeserializeUser(XElement xElement, IEnumerable<string> locations)
     {
-        string username = xElement.Attribute("Username")?.Value
-                       ?? xElement.Element("Username")?.Value
-                       ?? throw DeserializeFailed("Username", locations.Append("User"));
+        string username = GetAttributeOrElementValue(xElement, "Username", locations.Append("User"));
 
-        string firstName = xElement.Attribute("FirstName")?.Value
-                        ?? xElement.Element("FirstName")?.Value
-                        ?? throw DeserializeFailed("FirstName", locations.Append($"User ({username})"));
+        string firstName = GetAttributeOrElementValue(xElement, "FirstName", locations.Append($"User ({username})"));
 
-        string lastName = xElement.Attribute("LastName")?.Value
-                       ?? xElement.Element("LastName")?.Value
-                       ?? xElement.Element("LastName")?.Value ?? "";
+        string lastName;
+
+        try { lastName = GetAttributeOrElementValue(xElement, "LastName", locations); } catch { lastName = ""; }
 
         return new(username, firstName, lastName);
     }
@@ -90,18 +92,13 @@ public static class MessengerXmlSerializer
         DeserializeChat(xElement, users.AsReadOnly(), locations);
     public static Chat DeserializeChat(XElement xElement, IReadOnlyList<User> users, IEnumerable<string> locations)
     {
-        string chatName = xElement.Attribute("ChatName")?.Value 
-                       ?? xElement.Element("ChatName")?.Value 
-                       ?? throw DeserializeFailed("ChatName", locations.Append("Chat"));
+        string chatName = GetAttributeOrElementValue(xElement, "ChatName", locations.Append("Chat"));
 
-        string name = xElement.Attribute("Name")?.Value 
-                   ?? xElement.Element("Name")?.Value 
-                   ?? throw DeserializeFailed("Name", locations.Append($"Chat ({chatName})"));
+        string name = GetAttributeOrElementValue(xElement, "Name", locations.Append($"Chat ({chatName})"));
 
         Chat chat = new(chatName, name);
 
-        XElement membersElement = xElement.Element("Members") 
-                               ?? throw DeserializeFailed("Members", locations.Append($"Chat ({chatName})"));
+        XElement membersElement = xElement.Element("Members") ?? throw DeserializeFailed("Members", locations.Append($"Chat ({chatName})"));
 
         List<string> membersUsernames = membersElement.Elements("User")
                                                       .Select(member => member.Value)
@@ -126,20 +123,14 @@ public static class MessengerXmlSerializer
     public static Message DeserializeMessage(XElement messageElement, List<User> chatMembers, IEnumerable<string> locations) => DeserializeMessage(messageElement, chatMembers.AsReadOnly(), locations);
     public static Message DeserializeMessage(XElement messageElement, IReadOnlyList<User> chatMembers, IEnumerable<string> locations)
     {
-        string senderUsername = messageElement.Attribute("Sender")?.Value 
-                             ?? messageElement.Element("Sender")?.Value
-                             ?? throw DeserializeFailed("Sender", locations.Append($"Message"));
+        string senderUsername = GetAttributeOrElementValue(messageElement, "Sender", locations.Append($"Message"));
         User sender = chatMembers.FirstOrDefault(member => member.Username == senderUsername) ??
             throw new InvalidOperationException($"Отправитель {senderUsername} не числится в участниках чата");
 
         string? text = messageElement.Value.Trim();
-        string type = messageElement.Attribute("Type")?.Value 
-                   ?? messageElement.Element("Type")?.Value
-                   ?? throw DeserializeFailed("Type", locations.Append("Message"));
+        string type = GetAttributeOrElementValue(messageElement, "Type", locations.Append("Message"));
 
-        string dateTimeValue = messageElement.Attribute("DateTime")?.Value 
-                            ?? messageElement.Element("DateTime")?.Value
-                            ?? throw DeserializeFailed("DateTime", locations.Append($"Message"));
+        string dateTimeValue = GetAttributeOrElementValue(messageElement, "DateTime", locations.Append($"Message"));
         if (dateTimeValue.IsWhiteSpace()) 
             throw new InvalidOperationException($"Пустой элемент DateTime в элементе Message");
 
