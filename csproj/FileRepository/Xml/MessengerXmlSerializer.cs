@@ -7,7 +7,7 @@ namespace FakeMessenger.FileRepository.Xml;
 public static class MessengerXmlSerializer
 {
     public static XDocument SerializeMessenger(Messenger messenger) => 
-        new(new XElement("Messenger",
+        new(new XElement("_messenger",
             SerializeUser(messenger.User),
             new XElement("Contacts", from u in messenger.Contacts select SerializeUser(u)),
             new XElement("Chats", from c in messenger.Chats select SerializeChat(c))

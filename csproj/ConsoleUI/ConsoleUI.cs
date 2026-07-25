@@ -3,9 +3,9 @@ using System.ComponentModel.Design;
 using System.Numerics;
 
 namespace FakeMessenger.ConsoleUI;
-public static class ConsoleUI
+public class ConsoleUI(Messenger messenger)
 {
-    static Dictionary<string, (string Emoji, string Name, bool IsWithTime, bool IsWithText)> MessagesTypes = new() {
+    Dictionary<string, (string Emoji, string Name, bool IsWithTime, bool IsWithText)> MessagesTypes = new() {
         { "photo",        ("🖼", "Фотография",          false, true ) },
         { "video",        ("📹", "Видео",               false, true ) },
         { "video_note",   ("📹", "Видеосообщение",      true,  false) },
@@ -22,18 +22,18 @@ public static class ConsoleUI
         { "gift",         ("🎁", "Подарок",             false, false) },
     };
 
-    public static Messenger Messenger = new();
-    public static MessengerXmlFileRepository MessengerXmlFileRepository = new();
+    private Messenger _messenger = messenger;
+    public MessengerXmlFileRepository MessengerXmlFileRepository = new();
 
-    public const string ExitCommand = "/";
-    public static void Run()
+    public string ExitCommand = "/";
+    public void Run()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.InputEncoding = System.Text.Encoding.UTF8;
         MainMenu();
     }
 
-    public static void ShowMenu(string? message, Dictionary<string, Action> menuActions, string exitOption = "Выйти")
+    public void ShowMenu(string? message, Dictionary<string, Action> menuActions, string exitOption = "Выйти")
     {
         bool isInMenu = true;
         menuActions.Add(exitOption, () => isInMenu = false);
@@ -58,7 +58,7 @@ public static class ConsoleUI
         }
     }
 
-    public static void MainMenu()
+    public void MainMenu()
     {
         string? message = null;
 
@@ -75,7 +75,7 @@ public static class ConsoleUI
         ShowMenu(message, menuActions, "Выйти без сохранения");
     }
 
-    public static void ChatCommandMenu(Chat chat)
+    public void ChatCommandMenu(Chat chat)
     {
         string message = $"Вы в чате {chat.ChatName}";
 
@@ -89,7 +89,7 @@ public static class ConsoleUI
         ShowMenu(message, menuActions, "Выйти из чата");
     }
 
-    public static string SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
+    public string SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
     {
         bool isHasMessage = !string.IsNullOrWhiteSpace(message);
         if (isHasMessage) Console.Write($"{message}: ");
@@ -218,7 +218,7 @@ public static class ConsoleUI
         }
     }
 
-    public static void ViewChatHistory(Chat chat)
+    public void ViewChatHistory(Chat chat)
     {
         for (int i = 0; i < chat.Messages.Count; i++)
         {
@@ -236,43 +236,43 @@ public static class ConsoleUI
         }
     }
 
-    public static void NewContact()
+    public void NewContact()
     {
         Console.WriteLine("Введите / на любом из следующих этапов для выхода");
 
         Console.Write("Введите имя пользователя для контакта (только латинские символы и цифры): ");
         string? username = Console.ReadLine();
-        if (username == ConsoleUI.ExitCommand) return;
+        if (username == ExitCommand) return;
 
         Console.Write("Введите имя для контакта: ");
         string? firstName = Console.ReadLine();
-        if (username == ConsoleUI.ExitCommand) return;
+        if (username == ExitCommand) return;
 
         Console.Write("Введите фамилию для контакта: ");
         string? lastName = Console.ReadLine();
-        if (lastName == ConsoleUI.ExitCommand) return;
+        if (lastName == ExitCommand) return;
 
-        Messenger.NewContact(username ?? "", firstName ?? "", lastName ?? "");
+        _messenger.NewContact(username ?? "", firstName ?? "", lastName ?? "");
     }
 
-    public static void NewGroup()
+    public void NewGroup()
     {
         List<User> members = [];
         bool isChooseMembers = true;
 
         while (isChooseMembers)
         {
-            var searchQuery = ConsoleUI.SearchDialog(search =>
-                Messenger.GetContacts(search)
+            var searchQuery = SearchDialog(search =>
+                _messenger.GetContacts(search)
                          .Except(members)
                          .Select(member => member.Username)
                          .ToList(),
             "Выберите членов группы");
 
-            User contact = Messenger.Contacts.First(contact => contact.Username == searchQuery);
+            User contact = _messenger.Contacts.First(contact => contact.Username == searchQuery);
             members.Add(contact);
 
-            if (Messenger.Contacts.Count == members.Count) isChooseMembers = false;
+            if (_messenger.Contacts.Count == members.Count) isChooseMembers = false;
 
             bool isYNDialog = true;
             while (isChooseMembers && isYNDialog)
@@ -291,24 +291,24 @@ public static class ConsoleUI
 
         Console.Write("Введите уникальное имя группы (только латинские символы и цифры): ");
         string? chatName = Console.ReadLine();
-        if (chatName == ConsoleUI.ExitCommand) return;
+        if (chatName == ExitCommand) return;
         chatName ??= "";
 
         Console.Write("Введите название группы: ");
         string? groupName = Console.ReadLine();
-        if (groupName == ConsoleUI.ExitCommand) return;
+        if (groupName == ExitCommand) return;
         groupName ??= "";
 
-        Messenger.NewGroup(chatName, groupName, members);
+        _messenger.NewGroup(chatName, groupName, members);
     }
 
-    public static Chat ChooseChat()
+    public Chat ChooseChat()
     {
-        string chatName = ConsoleUI.SearchDialog(searchText => Messenger.GetChats(searchText).Select(chat => chat.ChatName).ToList(), "Выберите чат");
-        return Messenger.GetChats(chatName)[0];
+        string chatName = SearchDialog(searchText => _messenger.GetChats(searchText).Select(chat => chat.ChatName).ToList(), "Выберите чат");
+        return _messenger.GetChats(chatName)[0];
     }
 
-    public static void SendTextMessage(Chat chat)
+    public void SendTextMessage(Chat chat)
     {
         Console.WriteLine("Введите / на любом из следующих этапов для выхода");
 
@@ -318,17 +318,17 @@ public static class ConsoleUI
             Console.Write("Введите сообщение: ");
             text = Console.ReadLine();
         }
-        if (text == ConsoleUI.ExitCommand) return;
+        if (text == ExitCommand) return;
         text = text.Trim();
 
-        string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
+        string? sender = SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
 
 
         DateTime dateTime = DateTime.Now;
         Console.Write("Введите время сообщения: ");
 
         string? userInput = Console.ReadLine();
-        if (userInput == ConsoleUI.ExitCommand) return;
+        if (userInput == ExitCommand) return;
 
         DateTime.TryParse(userInput, out dateTime);
         if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
@@ -339,29 +339,29 @@ public static class ConsoleUI
                         dateTime: dateTime);
     }
 
-    public static void SendMultimediaMessage(Chat chat)
+    public void SendMultimediaMessage(Chat chat)
     {
         Console.WriteLine("Введите / на любом из следующих этапов для выхода");
 
-        string? type = ConsoleUI.SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения");
+        string? type = SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения");
 
         string? text = null;
         if (MessagesTypes[type].IsWithText)
         {
             Console.Write("Введите сообщение: ");
             text = Console.ReadLine() ?? "";
-            if (text == ConsoleUI.ExitCommand) return;
+            if (text == ExitCommand) return;
             text = text.Trim();
         }
 
-        string? sender = ConsoleUI.SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
+        string? sender = SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
 
 
         DateTime dateTime = DateTime.Now;
         Console.Write("Введите время сообщения: ");
 
         string? userInput = Console.ReadLine();
-        if (userInput == ConsoleUI.ExitCommand) return;
+        if (userInput == ExitCommand) return;
 
         DateTime.TryParse(userInput, out dateTime);
         if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
@@ -373,31 +373,31 @@ public static class ConsoleUI
                         dateTime: dateTime);
     }
 
-    public static void CreateContactChat()
+    public void CreateContactChat()
     {
-        string userName = ConsoleUI.SearchDialog(search => Messenger.GetContacts(search)
-                                                                    .Where(contact => !Messenger.Contacts.Contains(contact))
+        string userName = SearchDialog(search => _messenger.GetContacts(search)
+                                                                    .Where(contact => !_messenger.Contacts.Contains(contact))
                                                                     .Select(contact => contact.Username)
                                                                     .ToList(),
                                                                     "Выберете контакт");
 
-        User contact = Messenger.Contacts.First(user => user.Username == userName);
+        User contact = _messenger.Contacts.First(user => user.Username == userName);
 
         Chat chat = new(contact.Username, contact.FullName);
-        Messenger.AddChat(chat);
+        _messenger.AddChat(chat);
     }
 
-    public static void Save()
+    public void Save()
     {
-        MessengerXmlFileRepository.Save(Messenger);
+        MessengerXmlFileRepository.Save(_messenger);
         Console.WriteLine($"Сохранено в файл {MessengerXmlFileRepository.SaveFile}");
 
         Console.ReadKey(true);
     }
 
-    public static void Load()
+    public void Load()
     {
-        Messenger = MessengerXmlFileRepository.Load();
+        _messenger = MessengerXmlFileRepository.Load();
         Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);

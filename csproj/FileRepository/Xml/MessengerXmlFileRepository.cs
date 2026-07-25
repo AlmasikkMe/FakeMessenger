@@ -4,7 +4,7 @@ namespace FakeMessenger.FileRepository.Xml;
 public class MessengerXmlFileRepository
 {
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
-    public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
+    public FileInfo SaveFile { get; set; } = new("_messenger.Save.xml");
     public void Save(Messenger messenger) => MessengerXmlSerializer.SerializeMessenger(messenger).Save(SaveFile.FullName);
     public Messenger Load()
     {

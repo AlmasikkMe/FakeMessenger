@@ -1,3 +1,8 @@
-﻿using FakeMessenger.ConsoleUI;
+﻿using FakeMessenger;
+using FakeMessenger.ConsoleUI;
 
-ConsoleUI.Run();
+Messenger messenger = new();
+
+ConsoleUI consoleUI = new(messenger);
+
+consoleUI.Run();
