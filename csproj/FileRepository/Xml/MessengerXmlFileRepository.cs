@@ -1,13 +1,13 @@
 ﻿using System.Xml.Linq;
 
 namespace FakeMessenger.FileRepository.Xml;
-public class MessengerXmlFileRepository(MessengerXmlSerializer serializer)
+public class MessengerXmlFileRepository(MessengerXmlSerializer serializer) : MessengerFileRepository
 {
     private MessengerXmlSerializer Serializer { get; set; } = serializer;
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
-    public FileInfo SaveFile { get; set; } = new("_messenger.Save.xml");
-    public void Save(Messenger messenger) => Serializer.SerializeMessenger(messenger).Save(SaveFile.FullName);
-    public Messenger Load()
+    override public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
+    override public void Save(Messenger messenger) => Serializer.SerializeMessenger(messenger).Save(SaveFile.FullName);
+    override public Messenger Load()
     {
         if (!SaveFile.Exists) RenameOldFile();
 
