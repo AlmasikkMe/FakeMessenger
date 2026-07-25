@@ -11,7 +11,7 @@ public class MessengerXmlFileRepository(MessengerXmlSerializer serializer) : Mes
     {
         if (!SaveFile.Exists) RenameOldFile();
 
-        return Serializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), [SaveFile.FullName]);
+        return Serializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), this, [SaveFile.FullName]);
     }
     public void RenameOldFile()
     {

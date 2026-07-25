@@ -46,7 +46,7 @@ public class MessengerXmlSerializer
         xElement.Element(name)?.Value ??
         throw DeserializeFailed(name, location);
 
-    public Messenger DeserializeMessenger(XDocument doc, IEnumerable<string> locations)
+    public Messenger DeserializeMessenger(XDocument doc, MessengerFileRepository fileRepository, IEnumerable<string> locations)
     {
         User user;
         List<User> contacts;
@@ -67,7 +67,7 @@ public class MessengerXmlSerializer
                             .Select(chat => DeserializeChat(chat, contacts.Prepend(user).ToList(), locations.Append("Chats")))
                             .ToList();
 
-        Messenger messenger = new(user);
+        Messenger messenger = new(fileRepository, user);
 
         contacts.ForEach(messenger.NewContact);
         chats.ForEach(messenger.AddChat);

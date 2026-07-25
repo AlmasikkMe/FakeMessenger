@@ -1,10 +1,12 @@
-﻿using System.Diagnostics;
+﻿using FakeMessenger.FileRepository;
+using System.Diagnostics;
 using System.Xml.Linq;
 
 namespace FakeMessenger;
 
-public class Messenger(User? user = null)
+public class Messenger(MessengerFileRepository fileRepository, User? user = null)
 {
+    private MessengerFileRepository _fileRepository = fileRepository;
     public User User => _user;
     private User _user = user ?? new("@FakeChat", "Вы");
     public IReadOnlyList<User> Contacts => _contacts.AsReadOnly();
@@ -84,5 +86,19 @@ public class Messenger(User? user = null)
             throw new ArgumentException($"Чат {chat.ChatName} уже существует");
         
         _chats.Add(chat);
+    }
+
+    public void Save()
+    {
+        _fileRepository.Save(this);
+    }
+
+    public void Load()
+    {
+        Messenger messenger = _fileRepository.Load();
+
+        _user = messenger.User;
+        _contacts = messenger.Contacts.ToList();
+        _chats = messenger.Chats.ToList();
     }
 }

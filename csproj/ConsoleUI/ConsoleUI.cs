@@ -23,7 +23,6 @@ public class ConsoleUI(Messenger messenger)
     };
 
     private Messenger _messenger = messenger;
-    public MessengerXmlFileRepository MessengerXmlFileRepository = new(new());
 
     public string ExitCommand = "/";
     public void Run()
@@ -389,15 +388,15 @@ public class ConsoleUI(Messenger messenger)
 
     public void Save()
     {
-        MessengerXmlFileRepository.Save(_messenger);
-        Console.WriteLine($"Сохранено в файл {MessengerXmlFileRepository.SaveFile}");
+        _messenger.Save();
+        Console.WriteLine($"Сохранено в xml файл");
 
         Console.ReadKey(true);
     }
 
     public void Load()
     {
-        _messenger = MessengerXmlFileRepository.Load();
+        _messenger.Load();
         Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);
