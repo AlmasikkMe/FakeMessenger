@@ -1,4 +1,6 @@
-﻿namespace FakeMessenger.ConsoleUI;
+﻿using FakeMessenger.FileRepository.Xml;
+
+namespace FakeMessenger.ConsoleUI;
 
 public static class MessengerConsoleUI
 {
@@ -20,6 +22,7 @@ public static class MessengerConsoleUI
     };
 
     public static Messenger Messenger = new();
+    public static MessengerXmlFileRepository MessengerXmlFileRepository = new();
 
     public static void ViewChatHistory(Chat chat)
     {
@@ -192,15 +195,15 @@ public static class MessengerConsoleUI
 
     public static void Save()
     {
-        Messenger.Save();
-        Console.WriteLine($"Сохранено в файл {Messenger.SaveFile}");
+        MessengerXmlFileRepository.Save(Messenger);
+        Console.WriteLine($"Сохранено в файл {MessengerXmlFileRepository.SaveFile}");
 
         Console.ReadKey(true);
     }
 
     public static void Load()
     {
-        Messenger.Load(el => Console.WriteLine($"Не удалось найти элемент {el}"), (el, ex) => Console.WriteLine($"Не удалось загрузить элемент {el}: {ex.Message}"));
+        Messenger = MessengerXmlFileRepository.Load();
         Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);

@@ -9,13 +9,6 @@ public class User
         Username = username;
         FirstName = firstName;
         LastName = lastName;
-    }    
-    public User(XElement xElement)
-    {
-        Username = (xElement.Element("Username") ?? throw new InvalidOperationException("Обязательный элемент Username не найден в элементе")).Value;
-        FirstName = (xElement.Element("FirstName") ?? throw new InvalidOperationException("Обязательный элемент FirstName не найден в элементе")).Value;
-        XElement? lastNameElement = xElement.Element("LastName");
-        LastName = lastNameElement is null ? "" : lastNameElement.Value;
     }
 
     public string Username
@@ -45,10 +38,4 @@ public class User
         set => field = value.Trim(); 
     } 
     public string FullName => $"{FirstName} {LastName}".Trim();
-    public XElement ToXElement() =>
-        new ("User",
-            new XElement("Username", Username),
-            new XElement("FirstName", FirstName),
-            new XElement("LastName", LastName)
-            );
 }
