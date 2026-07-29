@@ -55,7 +55,10 @@ public class Chat
 
     public void AddMessage(Message message)
     {
+        if (_messages.Contains(message)) throw new ArgumentException("Это сообщение уже в чате.");
+
         _messages.Add(message);
+
         _messages = (from m in _messages
                      orderby m.DateTime
                      select m)
