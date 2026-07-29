@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using FakeMessenger.Core;
 
 namespace FakeMessenger.FileRepository.Xml;
 public class XmlFileRepository(XmlSerializer serializer) : Repository

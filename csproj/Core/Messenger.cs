@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Xml.Linq;
 
-namespace FakeMessenger;
+namespace FakeMessenger.Core;
 
 public class Messenger(Repository fileRepository, User? user = null)
 {

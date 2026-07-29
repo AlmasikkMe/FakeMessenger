@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
-namespace FakeMessenger;
+namespace FakeMessenger.Core;
 public class Chat
 {
     public Chat(string chatName, string name)

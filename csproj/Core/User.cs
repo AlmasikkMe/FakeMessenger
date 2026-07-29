@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace FakeMessenger;
+namespace FakeMessenger.Core;
 
 public class User
 {

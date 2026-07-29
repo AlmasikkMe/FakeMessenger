@@ -1,4 +1,5 @@
-﻿using FakeMessenger.FileRepository.Xml;
+﻿using FakeMessenger.Core;
+using FakeMessenger.FileRepository.Xml;
 using System.ComponentModel.Design;
 using System.Numerics;
 

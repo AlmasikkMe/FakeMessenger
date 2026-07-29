@@ -1,4 +1,4 @@
-﻿using FakeMessenger;
+﻿using FakeMessenger.Core;
 using FakeMessenger.ConsoleUI;
 using FakeMessenger.FileRepository.Xml;
 

@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
+using FakeMessenger.Core;
 
 namespace FakeMessenger.FileRepository.Xml;
 public class XmlSerializer

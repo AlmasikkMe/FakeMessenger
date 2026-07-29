@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
+using FakeMessenger.Core;
 
 namespace FakeMessenger.FileRepository
 {
