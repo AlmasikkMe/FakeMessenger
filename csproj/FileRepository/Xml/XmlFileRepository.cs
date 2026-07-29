@@ -1,16 +1,19 @@
-﻿using System.Xml.Linq;
+﻿using FakeMessenger.Core;
+using System.Xml.Linq;
 
 namespace FakeMessenger.FileRepository.Xml;
-public class MessengerXmlFileRepository
+
+public class XmlFileRepository(XmlSerializer serializer) : Repository
 {
+    private XmlSerializer Serializer { get; set; } = serializer;
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
-    public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
-    public void Save(Messenger messenger) => MessengerXmlSerializer.SerializeMessenger(messenger).Save(SaveFile.FullName);
-    public Messenger Load()
+    override public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
+    override public void Save(Messenger messenger) => Serializer.SerializeMessenger(messenger).Save(SaveFile.FullName);
+    override public Messenger Load()
     {
         if (!SaveFile.Exists) RenameOldFile();
 
-        return MessengerXmlSerializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), [SaveFile.FullName]);
+        return Serializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), this, [SaveFile.FullName]);
     }
     public void RenameOldFile()
     {

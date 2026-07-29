@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
-using System.Xml.Linq;
+﻿using FakeMessenger.FileRepository;
 
-namespace FakeMessenger;
+namespace FakeMessenger.Core;
 
-public class Messenger(User? user = null)
+public class Messenger(Repository fileRepository, User? user = null)
 {
+    private Repository _fileRepository = fileRepository;
     public User User => _user;
     private User _user = user ?? new("@FakeChat", "Вы");
     public IReadOnlyList<User> Contacts => _contacts.AsReadOnly();
@@ -15,11 +15,11 @@ public class Messenger(User? user = null)
     public void NewContact(string username, string firstName, string lastName = "")
     {
         if (username.IsWhiteSpace()) username = $"@user{_contacts.Count + 1}";
-        if (firstName.IsWhiteSpace()) firstName =  $"Контакт {_contacts.Count + 1}";
+        if (firstName.IsWhiteSpace()) firstName = $"Контакт {_contacts.Count + 1}";
 
         if (!username.StartsWith("@")) username = $"@{username}";
 
-        if (_contacts.Any(contact => contact.Username == username)) 
+        if (_contacts.Any(contact => contact.Username == username))
             throw new ArgumentException($"Пользователь с именем {username} уже существует!");
 
         _contacts.Add(new(username, firstName, lastName));
@@ -39,19 +39,19 @@ public class Messenger(User? user = null)
         if (!members.Contains(User))
             members = members.Prepend(User).ToList();
 
-        if (chatName.IsWhiteSpace()) 
+        if (chatName.IsWhiteSpace())
             chatName = $"@chat{_chats.Count + 1}";
 
-        if (_chats.Any(chat => chat.ChatName == chatName)) 
+        if (_chats.Any(chat => chat.ChatName == chatName))
             throw new ArgumentException("Чат с таким уникальным именем уже существует!");
 
-        if (members.Count == 1) 
+        if (members.Count == 1)
             throw new ArgumentException("Требуется как минимум 1 участник группы");
 
-        if (members.Union(_contacts).GroupBy(member => member.Username).Any(g => g.Count() > 1)) 
+        if (members.Union(_contacts).GroupBy(member => member.Username).Any(g => g.Count() > 1))
             throw new ArgumentException("Обнаружены разные объекты с одинаковым UserName!");
 
-        if (groupName.IsWhiteSpace()) 
+        if (groupName.IsWhiteSpace())
         {
             groupName = string.Join(", ", members.Take(3).Select(member => member.FullName));
 
@@ -80,9 +80,23 @@ public class Messenger(User? user = null)
     }
     public void AddChat(Chat chat)
     {
-        if (_chats.Select(chat => chat.ChatName).Contains(chat.ChatName)) 
+        if (_chats.Select(chat => chat.ChatName).Contains(chat.ChatName))
             throw new ArgumentException($"Чат {chat.ChatName} уже существует");
-        
+
         _chats.Add(chat);
+    }
+
+    public void Save()
+    {
+        _fileRepository.Save(this);
+    }
+
+    public void Load()
+    {
+        Messenger messenger = _fileRepository.Load();
+
+        _user = messenger.User;
+        _contacts = messenger.Contacts.ToList();
+        _chats = messenger.Chats.ToList();
     }
 }

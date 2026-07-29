@@ -1,26 +1,25 @@
-﻿using System.Reflection;
-using System.Xml;
+﻿using FakeMessenger.Core;
 using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace FakeMessenger.FileRepository.Xml;
-public static class MessengerXmlSerializer
+
+public class XmlSerializer
 {
-    public static XDocument SerializeMessenger(Messenger messenger) => 
-        new(new XElement("Messenger",
+    public XDocument SerializeMessenger(Messenger messenger) =>
+        new(new XElement("_messenger",
             SerializeUser(messenger.User),
             new XElement("Contacts", from u in messenger.Contacts select SerializeUser(u)),
             new XElement("Chats", from c in messenger.Chats select SerializeChat(c))
             ));
 
-    public static XElement SerializeUser(User user) =>
-        new ("User",
+    public XElement SerializeUser(User user) =>
+        new("User",
             new XAttribute("Username", user.Username),
             new XAttribute("FirstName", user.FirstName),
             new XAttribute("LastName", user.LastName)
             );
-    
-    public static XElement SerializeChat(Chat chat) =>
+
+    public XElement SerializeChat(Chat chat) =>
         new("Chat",
             new XAttribute("ChatName", chat.ChatName),
             new XAttribute("Name", chat.Name),
@@ -28,7 +27,7 @@ public static class MessengerXmlSerializer
             new XElement("Messages", from m in chat.Messages select SerializeMessage(m))
             );
 
-    public static XElement SerializeMessage(Message message) =>
+    public XElement SerializeMessage(Message message) =>
         new("Message",
             new XAttribute("Sender", message.Sender.Username),
             new XAttribute("Type", message.Type),
@@ -38,15 +37,15 @@ public static class MessengerXmlSerializer
 
 
 
-    private static InvalidOperationException DeserializeFailed(string element, IEnumerable<string> locations) =>
+    private InvalidOperationException DeserializeFailed(string element, IEnumerable<string> locations) =>
         new($"Не найден обязательный элемент {element} в {string.Join(" - ", locations)}");
 
-    private static string GetAttributeOrElementValue(XElement xElement, string name, IEnumerable<string> location) =>
+    private string GetAttributeOrElementValue(XElement xElement, string name, IEnumerable<string> location) =>
         xElement.Attribute(name)?.Value ??
         xElement.Element(name)?.Value ??
         throw DeserializeFailed(name, location);
 
-    public static Messenger DeserializeMessenger(XDocument doc, IEnumerable<string> locations)
+    public Messenger DeserializeMessenger(XDocument doc, Repository fileRepository, IEnumerable<string> locations)
     {
         User user;
         List<User> contacts;
@@ -67,7 +66,7 @@ public static class MessengerXmlSerializer
                             .Select(chat => DeserializeChat(chat, contacts.Prepend(user).ToList(), locations.Append("Chats")))
                             .ToList();
 
-        Messenger messenger = new(user);
+        Messenger messenger = new(fileRepository, user);
 
         contacts.ForEach(messenger.NewContact);
         chats.ForEach(messenger.AddChat);
@@ -75,7 +74,7 @@ public static class MessengerXmlSerializer
         return messenger;
     }
 
-    public static User DeserializeUser(XElement xElement, IEnumerable<string> locations)
+    public User DeserializeUser(XElement xElement, IEnumerable<string> locations)
     {
         string username = GetAttributeOrElementValue(xElement, "Username", locations.Append("User"));
 
@@ -88,9 +87,9 @@ public static class MessengerXmlSerializer
         return new(username, firstName, lastName);
     }
 
-    public static Chat DeserializeChat(XElement xElement, List<User> users, IEnumerable<string> locations) =>
+    public Chat DeserializeChat(XElement xElement, List<User> users, IEnumerable<string> locations) =>
         DeserializeChat(xElement, users.AsReadOnly(), locations);
-    public static Chat DeserializeChat(XElement xElement, IReadOnlyList<User> users, IEnumerable<string> locations)
+    public Chat DeserializeChat(XElement xElement, IReadOnlyList<User> users, IEnumerable<string> locations)
     {
         string chatName = GetAttributeOrElementValue(xElement, "ChatName", locations.Append("Chat"));
 
@@ -120,8 +119,8 @@ public static class MessengerXmlSerializer
         return chat;
     }
 
-    public static Message DeserializeMessage(XElement messageElement, List<User> chatMembers, IEnumerable<string> locations) => DeserializeMessage(messageElement, chatMembers.AsReadOnly(), locations);
-    public static Message DeserializeMessage(XElement messageElement, IReadOnlyList<User> chatMembers, IEnumerable<string> locations)
+    public Message DeserializeMessage(XElement messageElement, List<User> chatMembers, IEnumerable<string> locations) => DeserializeMessage(messageElement, chatMembers.AsReadOnly(), locations);
+    public Message DeserializeMessage(XElement messageElement, IReadOnlyList<User> chatMembers, IEnumerable<string> locations)
     {
         string senderUsername = GetAttributeOrElementValue(messageElement, "Sender", locations.Append($"Message"));
         User sender = chatMembers.FirstOrDefault(member => member.Username == senderUsername) ??
@@ -131,7 +130,7 @@ public static class MessengerXmlSerializer
         string type = GetAttributeOrElementValue(messageElement, "Type", locations.Append("Message"));
 
         string dateTimeValue = GetAttributeOrElementValue(messageElement, "DateTime", locations.Append($"Message"));
-        if (dateTimeValue.IsWhiteSpace()) 
+        if (dateTimeValue.IsWhiteSpace())
             throw new InvalidOperationException($"Пустой элемент DateTime в элементе Message");
 
         DateTime dateTime;

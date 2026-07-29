@@ -1,10 +1,8 @@
-﻿using System.Xml.Linq;
-
-namespace FakeMessenger;
+﻿namespace FakeMessenger.Core;
 
 public class User
 {
-    public User(string username, string firstName, string lastName = "") 
+    public User(string username, string firstName, string lastName = "")
     {
         Username = username;
         FirstName = firstName;
@@ -14,7 +12,8 @@ public class User
     public string Username
     {
         get;
-        set {
+        set
+        {
             string username = value.Trim();
             if (!username.StartsWith("@")) username = $"@{username}";
 
@@ -27,15 +26,15 @@ public class User
         }
     }
 
-    public string FirstName 
-    { 
-        get;
-        set => field = !value.IsWhiteSpace() ? value.Trim() : throw new ArgumentException("Имя не может быть пустым"); 
-    } 
-    public string LastName 
+    public string FirstName
     {
         get;
-        set => field = value.Trim(); 
-    } 
+        set => field = !value.IsWhiteSpace() ? value.Trim() : throw new ArgumentException("Имя не может быть пустым");
+    }
+    public string LastName
+    {
+        get;
+        set => field = value.Trim();
+    }
     public string FullName => $"{FirstName} {LastName}".Trim();
 }
