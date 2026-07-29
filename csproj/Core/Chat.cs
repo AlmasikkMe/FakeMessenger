@@ -1,8 +1,7 @@
 ﻿using System.Data;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 
 namespace FakeMessenger.Core;
+
 public class Chat
 {
     public Chat(string chatName, string name)
@@ -58,8 +57,8 @@ public class Chat
     {
         _messages.Add(message);
         _messages = (from m in _messages
-                    orderby m.DateTime
-                    select m)
+                     orderby m.DateTime
+                     select m)
                     .ToList();
     }
 

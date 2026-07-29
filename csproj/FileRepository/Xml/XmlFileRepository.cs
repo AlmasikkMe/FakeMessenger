@@ -1,7 +1,8 @@
-﻿using System.Xml.Linq;
-using FakeMessenger.Core;
+﻿using FakeMessenger.Core;
+using System.Xml.Linq;
 
 namespace FakeMessenger.FileRepository.Xml;
+
 public class XmlFileRepository(XmlSerializer serializer) : Repository
 {
     private XmlSerializer Serializer { get; set; } = serializer;

@@ -1,13 +1,11 @@
-﻿using System.Reflection;
-using System.Xml;
+﻿using FakeMessenger.Core;
 using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
-using FakeMessenger.Core;
 
 namespace FakeMessenger.FileRepository.Xml;
+
 public class XmlSerializer
 {
-    public XDocument SerializeMessenger(Messenger messenger) => 
+    public XDocument SerializeMessenger(Messenger messenger) =>
         new(new XElement("_messenger",
             SerializeUser(messenger.User),
             new XElement("Contacts", from u in messenger.Contacts select SerializeUser(u)),
@@ -15,12 +13,12 @@ public class XmlSerializer
             ));
 
     public XElement SerializeUser(User user) =>
-        new ("User",
+        new("User",
             new XAttribute("Username", user.Username),
             new XAttribute("FirstName", user.FirstName),
             new XAttribute("LastName", user.LastName)
             );
-    
+
     public XElement SerializeChat(Chat chat) =>
         new("Chat",
             new XAttribute("ChatName", chat.ChatName),
@@ -132,7 +130,7 @@ public class XmlSerializer
         string type = GetAttributeOrElementValue(messageElement, "Type", locations.Append("Message"));
 
         string dateTimeValue = GetAttributeOrElementValue(messageElement, "DateTime", locations.Append($"Message"));
-        if (dateTimeValue.IsWhiteSpace()) 
+        if (dateTimeValue.IsWhiteSpace())
             throw new InvalidOperationException($"Пустой элемент DateTime в элементе Message");
 
         DateTime dateTime;

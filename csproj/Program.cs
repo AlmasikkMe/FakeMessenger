@@ -1,5 +1,5 @@
-﻿using FakeMessenger.Core;
-using FakeMessenger.ConsoleUI;
+﻿using FakeMessenger.ConsoleUI;
+using FakeMessenger.Core;
 using FakeMessenger.FileRepository.Xml;
 
 XmlSerializer xmlSerializer = new();

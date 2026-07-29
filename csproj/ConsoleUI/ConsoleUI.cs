@@ -1,9 +1,7 @@
 ﻿using FakeMessenger.Core;
-using FakeMessenger.FileRepository.Xml;
-using System.ComponentModel.Design;
-using System.Numerics;
 
 namespace FakeMessenger.ConsoleUI;
+
 public class ConsoleUI(Messenger messenger)
 {
     Dictionary<string, (string Emoji, string Name, bool IsWithTime, bool IsWithText)> MessagesTypes = new() {
@@ -213,8 +211,8 @@ public class ConsoleUI(Messenger messenger)
         finally
         {
             Console.CursorVisible = true;
-                            
-            if (isInAltBuffer) Console.Write("\x1b[?1049l"); 
+
+            if (isInAltBuffer) Console.Write("\x1b[?1049l");
         }
     }
 

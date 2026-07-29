@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace FakeMessenger.Core;
+﻿namespace FakeMessenger.Core;
 
 public class Message(User sender)
 {
