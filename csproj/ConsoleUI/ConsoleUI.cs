@@ -15,7 +15,7 @@ public class ConsoleUI(Messenger messenger)
         { "sticker",      ("🎨", "Стикер",              false, false) },
         { "poll",         ("📊", "Опрос",               false, true ) },
         { "quiz",         ("📊", "Викторина",           false, true ) },
-        { "contact",      ("👤", "Контакт",             false, false) },
+        { "u",      ("👤", "Контакт",             false, false) },
         { "location",     ("📍", "Геолокация",          false, false) },
         { "live_location",("🚨", "Живая геолокация",    false, false) },
         { "gift",         ("🎁", "Подарок",             false, false) },
@@ -374,14 +374,18 @@ public class ConsoleUI(Messenger messenger)
     public void CreateContactChat()
     {
         string userName = SearchDialog(search => _messenger.GetContacts(search)
-                                                                    .Where(contact => !_messenger.Contacts.Contains(contact))
-                                                                    .Select(contact => contact.Username)
-                                                                    .ToList(),
-                                                                    "Выберете контакт");
+                                                           .Where(u => !_messenger.Chats
+                                                                                  .Select(c => c.ChatName)
+                                                                                  .Any(c => c == u.Username))
+                                                           .Select(u => u.Username)
+                                                           .ToList(),
+                                                           "Выберете контакт");
 
         User contact = _messenger.Contacts.First(user => user.Username == userName);
 
         Chat chat = new(contact.Username, contact.FullName);
+        chat.AddMembers([contact, _messenger.User]);
+
         _messenger.AddChat(chat);
     }
 
