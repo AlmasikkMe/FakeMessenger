@@ -34,6 +34,11 @@ public class Messenger(Repository fileRepository, User? user = null)
         _contacts.Add(user);
     }
 
+    public void RemoveContact(User contact)
+    {
+        if (!_contacts.Remove(contact)) throw new ArgumentException($"Контакт {contact.Username} не найден");
+    }
+
     public void NewGroup(string chatName, string groupName, List<User> members)
     {
         if (!members.Contains(User))
@@ -84,6 +89,10 @@ public class Messenger(Repository fileRepository, User? user = null)
             throw new ArgumentException($"Чат {chat.ChatName} уже существует");
 
         _chats.Add(chat);
+    }
+    public void RemoveChat(Chat chat)
+    {
+        if (!_chats.Remove(chat)) throw new ArgumentException($"Чат {chat.ChatName} не найден");
     }
 
     public void Save()

@@ -72,4 +72,9 @@ public class Chat
 
         AddMessage(message);
     }
+
+    public void DeleteMessage(Message message)
+    {
+        if (!_messages.Remove(message)) throw new ArgumentException($"Сообщение \"{message.Text}\" не найдено");
+    }
 }
