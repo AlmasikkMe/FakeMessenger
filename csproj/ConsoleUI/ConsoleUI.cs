@@ -65,6 +65,8 @@ public class ConsoleUI(Messenger messenger)
             { "Создать контакт", NewContact },
             { "Создать группу", NewGroup },
             { "Перейти в чат", () => ChatCommandMenu(ChooseChat()) },
+            { "Удалить чат", () => _messenger.RemoveChat(ChooseChat("Выберите чат для удаления")) },
+            { "Удалить контакт", () => _messenger.RemoveContact(ChooseContact("Выберите контакт для удаления")) },
             { "Сохранить",  Save },
             { "Загрузить", Load },
             { "Создать чат с контактом", CreateContactChat },
