@@ -69,14 +69,20 @@ public class Messenger(Repository fileRepository, User? user = null)
 
         _chats.Add(chat);
     }
-    public List<Chat> GetChats(string search = "")
+
+    [Obsolete("Используйте свойство Chats для получения всех чатов.")]
+    public List<Chat> GetChats() => Chats.ToList();
+    public List<Chat> GetChats(string search)
     {
         return (from chat in _chats
                 where chat.ChatName.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
                 select chat)
                 .ToList();
     }
-    public List<User> GetContacts(string search = "")
+
+    [Obsolete("Используйте свойство Contacts для получения всех контактов.")]
+    public List<User> GetContacts() => Contacts.ToList();
+    public List<User> GetContacts(string search)
     {
         return (from contact in _contacts
                 where contact.Username.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)

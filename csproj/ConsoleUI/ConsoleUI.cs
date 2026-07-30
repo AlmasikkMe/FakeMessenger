@@ -86,7 +86,7 @@ public class ConsoleUI(Messenger messenger)
 
         ShowMenu(message, menuActions, "Выйти из чата");
     }
-
+    
     public string SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
     {
         bool isHasMessage = !string.IsNullOrWhiteSpace(message);
@@ -260,14 +260,7 @@ public class ConsoleUI(Messenger messenger)
 
         while (isChooseMembers)
         {
-            var searchQuery = SearchDialog(search =>
-                _messenger.GetContacts(search)
-                         .Except(members)
-                         .Select(member => member.Username)
-                         .ToList(),
-            "Выберите членов группы");
-
-            User contact = _messenger.Contacts.First(contact => contact.Username == searchQuery);
+            User contact = ChooseContact("Добавьте члена группы", members);
             members.Add(contact);
 
             if (_messenger.Contacts.Count == members.Count) isChooseMembers = false;
@@ -300,10 +293,22 @@ public class ConsoleUI(Messenger messenger)
         _messenger.NewGroup(chatName, groupName, members);
     }
 
-    public Chat ChooseChat()
+    private Chat ChooseChat(string message = "Выберите чат", List<Chat>? excludedChats = null)
     {
-        string chatName = SearchDialog(searchText => _messenger.GetChats(searchText).Select(chat => chat.ChatName).ToList(), "Выберите чат");
-        return _messenger.GetChats(chatName)[0];
+        string chatName = SearchDialog(searchText => _messenger.GetChats(searchText)
+                                                               .Except(excludedChats ?? [])
+                                                               .Select(chat => chat.ChatName)
+                                                               .ToList(), message);
+        return _messenger.Chats.First(c => c.ChatName == chatName);
+    }
+
+    private User ChooseContact(string message = "Выберите контакт", List<User>? excludedUsers = null)
+    {
+        string username = SearchDialog(searchText => _messenger.GetContacts(searchText)
+                                                               .Except(excludedUsers ?? [])
+                                                               .Select(u => u.Username)
+                                                               .ToList(), message);
+        return _messenger.Contacts.First(u => u.Username == username);
     }
 
     public void SendTextMessage(Chat chat)
@@ -319,7 +324,7 @@ public class ConsoleUI(Messenger messenger)
         if (text == ExitCommand) return;
         text = text.Trim();
 
-        string? sender = SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
+        User sender = ChooseContact("Выберете отправителя");
 
 
         DateTime dateTime = DateTime.Now;
@@ -332,9 +337,7 @@ public class ConsoleUI(Messenger messenger)
         if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
 
 
-        chat.AddMessage(sender: chat.GetMembers().First(member => member.Username == sender),
-                        text: text,
-                        dateTime: dateTime);
+        chat.AddMessage(sender, text, "text", dateTime);
     }
 
     public void SendMultimediaMessage(Chat chat)
@@ -352,7 +355,7 @@ public class ConsoleUI(Messenger messenger)
             text = text.Trim();
         }
 
-        string? sender = SearchDialog(search => chat.GetMembers(search).Select(member => member.Username).ToList(), "Выберите отправителя");
+        User sender = ChooseContact("Выберите отправителя");
 
 
         DateTime dateTime = DateTime.Now;
@@ -365,23 +368,14 @@ public class ConsoleUI(Messenger messenger)
         if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
 
 
-        chat.AddMessage(sender: chat.GetMembers().First(member => member.Username == sender),
-                        text: text,
-                        type: type,
-                        dateTime: dateTime);
+        chat.AddMessage(sender, text, type, dateTime);
     }
 
     public void CreateContactChat()
     {
-        string userName = SearchDialog(search => _messenger.GetContacts(search)
-                                                           .Where(u => !_messenger.Chats
-                                                                                  .Select(c => c.ChatName)
-                                                                                  .Any(c => c == u.Username))
-                                                           .Select(u => u.Username)
-                                                           .ToList(),
-                                                           "Выберете контакт");
-
-        User contact = _messenger.Contacts.First(user => user.Username == userName);
+        User contact = ChooseContact(excludedUsers: _messenger.Contacts
+                                                              .Where(u => _messenger.Chats.Any(c => c.ChatName == u.Username))
+                                                              .ToList());
 
         Chat chat = new(contact.Username, contact.FullName);
         chat.AddMembers([contact, _messenger.User]);
