@@ -1,0 +1,62 @@
+name: 🐞 Ошибка
+description: Сообщите о том что работает не так как должно работать.
+title: "[Bug] "
+labels: ["баг"]
+
+body:
+  - type: input
+    id: app_version
+    attributes:
+      label: Версия FakeMessenger
+      description: Укажите версию приложения (например, v1.2.3)
+      placeholder: vX.Y.Z
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 🔖 Опишите вашу проблему
+      description: Чётко опишите проблему, с которой вы столкнулись
+      placeholder: Описание проблемы
+    validations:
+      required: true
+      
+  - type: textarea
+    id: steps
+    attributes:
+      label: 👣 Шаги для воспроизведения
+      description: Опишите, что нужно сделать, чтобы увидеть ошибку
+      placeholder: |
+        1. Открыть страницу [...]
+        2. Нажать кнопку [...]
+        3. Увидеть ошибку [...]
+    validations:
+        required: true
+  
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📋 Вывод консоли
+      description: Для консольной версии
+      render: text
+      placeholder: Вставьте вывод консоли (нажмите ESC в главном меню и скопируйте всё)
+  
+  - type: upload
+    id: screenshots
+    attributes:
+      label: 📸 Скриншоты
+      description: Для версии с UI
+
+  - type: upload
+    id: xml-file
+    attributes:
+      label: 📄 Приложите сохранение
+      description: Загрузите сюда ваш файл сохранение для дополнительного анализа.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 📎 Дополнительный контекст
+      description: Добавьте другие детали
+      placeholder: Любые дополнительные материалы

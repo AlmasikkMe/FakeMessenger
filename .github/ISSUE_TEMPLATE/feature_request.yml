@@ -1,0 +1,35 @@
+name: 💡 Идея
+description: Предложить улучшение или новую функциональность
+labels: ["предложение"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label:  Предлагаемое решение
+      description: Опишите, как именно вы предлагаете улучшить проект
+      placeholder: |
+        Предлагаю добавить [...]
+        Это позволит [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: before
+    attributes:
+      label: До
+      render: text
+      description: Опишите как это было до
+  
+  - type: textarea
+    id: after
+    attributes:
+      label: После
+      render: text
+      description: Опишите как это должно выглядеть после
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Дополнительный контекст
+      placeholder: Любые дополнительные материалы
