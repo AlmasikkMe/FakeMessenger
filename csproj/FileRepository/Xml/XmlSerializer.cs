@@ -16,7 +16,8 @@ public class XmlSerializer
         new("User",
             new XAttribute("Username", user.Username),
             new XAttribute("FirstName", user.FirstName),
-            new XAttribute("LastName", user.LastName)
+            new XAttribute("LastName", user.LastName),
+            new XAttribute("IsDeleted", user.IsDeleted)
             );
 
     public XElement SerializeChat(Chat chat) =>
@@ -83,6 +84,8 @@ public class XmlSerializer
         string lastName;
 
         try { lastName = GetAttributeOrElementValue(xElement, "LastName", locations); } catch { lastName = ""; }
+
+        bool isDeleted = (bool?)xElement.Attribute("IsDeleted") ?? false;
 
         return new(username, firstName, lastName);
     }

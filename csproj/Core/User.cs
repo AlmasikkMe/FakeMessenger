@@ -28,13 +28,15 @@ public class User
 
     public string FirstName
     {
-        get;
+        get => !IsDeleted ? field : "Удалённый пользователь";
         set => field = !value.IsWhiteSpace() ? value.Trim() : throw new ArgumentException("Имя не может быть пустым");
     }
     public string LastName
     {
-        get;
+        get => !IsDeleted ? field : string.Empty;
         set => field = value.Trim();
     }
     public string FullName => $"{FirstName} {LastName}".Trim();
+
+    public bool IsDeleted = false;
 }

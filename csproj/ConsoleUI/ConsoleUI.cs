@@ -308,8 +308,10 @@ public class ConsoleUI(Messenger messenger)
     {
         string username = SearchDialog(searchText => _messenger.GetContacts(searchText)
                                                                .Except(excludedUsers ?? [])
+                                                               .Where(u => !u.IsDeleted)
                                                                .Select(u => u.Username)
                                                                .ToList(), message);
+
         return _messenger.Contacts.First(u => u.Username == username);
     }
 

@@ -36,7 +36,16 @@ public class Messenger(Repository fileRepository, User? user = null)
 
     public void RemoveContact(User contact)
     {
-        if (!_contacts.Remove(contact)) throw new ArgumentException($"Контакт {contact.Username} не найден");
+        if (!_contacts.Contains(contact)) throw new ArgumentException($"Контакт {contact.Username} не найден");
+
+        char[] chars = Enumerable.Range('0', 10)
+                                 .Concat(Enumerable.Range('a', 26))
+                                 .Concat(Enumerable.Range('A', 26))
+                                 .Select(c => (char)c)
+                                 .ToArray();
+        contact.Username = new string(Random.Shared.GetItems(chars, 16));
+
+        contact.IsDeleted = true;
     }
 
     public void NewGroup(string chatName, string groupName, List<User> members)
