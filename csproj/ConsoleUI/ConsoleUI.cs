@@ -310,6 +310,8 @@ public class ConsoleUI(Messenger messenger)
                                                                             .Select(u => u.Username)
                                                                             .ToList(), message);
 
+        if (username == _messenger.User.Username) return _messenger.User;
+
         return _messenger.Contacts.First(u => u.Username == username);
     }
 
