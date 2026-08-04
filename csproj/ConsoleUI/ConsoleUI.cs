@@ -82,8 +82,8 @@ public class ConsoleUI(Messenger messenger)
         Dictionary<string, Action> menuActions = new()
         {
             { "Посмотреть историю чата", () => { ViewChatHistory(chat); Console.ReadKey(true); } },
-            { "Отправить сообщение", () => SendTextMessage(chat) },
-            { "Отправить мультимедиа", () => SendMultimediaMessage(chat) },
+            { "Отправить сообщение", () => SendMessage(chat, type: "text") },
+            { "Отправить мультимедиа", () => SendMessage(chat) },
         };
 
         ShowMenu(message, menuActions, "Выйти из чата");
@@ -304,75 +304,66 @@ public class ConsoleUI(Messenger messenger)
         return _messenger.Chats.First(c => c.ChatName == chatName);
     }
 
-    private User ChooseContact(string message = "Выберите контакт", List<User>? excludedUsers = null)
+    private User ChooseContact(Func<string, List<User>> usersUpdate, string message = "Выбурите контакт")
     {
-        string username = SearchDialog(searchText => _messenger.GetContacts(searchText)
-                                                               .Except(excludedUsers ?? [])
-                                                               .Where(u => !u.IsDeleted)
-                                                               .Select(u => u.Username)
-                                                               .ToList(), message);
+        string username = SearchDialog(searchText => usersUpdate(searchText).Where(u => !u.IsDeleted)
+                                                                            .Select(u => u.Username)
+                                                                            .ToList(), message);
 
         return _messenger.Contacts.First(u => u.Username == username);
     }
 
-    public void SendTextMessage(Chat chat)
+    private User ChooseContact(string message = "Выберите контакт", List<User>? excludedUsers = null)
     {
+        return ChooseContact(searchText => _messenger.GetContacts(searchText)
+                                                     .Except(excludedUsers ?? [])
+                                                     .ToList());
+    }
+
+    public void SendMessage(Chat chat, User? sender = null, string? text = null, string? type = null, DateTime? dateTime = null)
+    {
+        string? userInput;
         Console.WriteLine("Введите / на любом из следующих этапов для выхода");
 
-        string? text = null;
+        sender ??= ChooseContact(searchText => chat.GetMembers(searchText).Where(u => !u.IsDeleted).ToList(), "Выберете отправителя");
+
         while (string.IsNullOrWhiteSpace(text))
         {
             Console.Write("Введите сообщение: ");
-            text = Console.ReadLine();
+
+            userInput = Console.ReadLine();
+            if (userInput == ExitCommand) throw new OperationCanceledException("Выход");
+
+            text = userInput;
         }
-        if (text == ExitCommand) return;
-        text = text.Trim();
 
-        User sender = ChooseContact("Выберете отправителя");
+        type ??= SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения");
 
-
-        DateTime dateTime = DateTime.Now;
-        Console.Write("Введите время сообщения: ");
-
-        string? userInput = Console.ReadLine();
-        if (userInput == ExitCommand) return;
-
-        DateTime.TryParse(userInput, out dateTime);
-        if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
-
-
-        chat.AddMessage(sender, text, "text", dateTime);
-    }
-
-    public void SendMultimediaMessage(Chat chat)
-    {
-        Console.WriteLine("Введите / на любом из следующих этапов для выхода");
-
-        string? type = SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения");
-
-        string? text = null;
-        if (MessagesTypes[type].IsWithText)
+        if (dateTime is null)
         {
-            Console.Write("Введите сообщение: ");
-            text = Console.ReadLine() ?? "";
-            if (text == ExitCommand) return;
-            text = text.Trim();
+            Console.Write("Введите дату отправки: ");
+
+            userInput = Console.ReadLine();
+            if (userInput == ExitCommand) throw new OperationCanceledException("Выход");
+
+            DateTime outDateTime;
+            if (DateTime.TryParse(userInput, out outDateTime)) dateTime = outDateTime;
+            if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
         }
-
-        User sender = ChooseContact("Выберите отправителя");
-
-
-        DateTime dateTime = DateTime.Now;
-        Console.Write("Введите время сообщения: ");
-
-        string? userInput = Console.ReadLine();
-        if (userInput == ExitCommand) return;
-
-        DateTime.TryParse(userInput, out dateTime);
-        if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
-
 
         chat.AddMessage(sender, text, type, dateTime);
+    }
+
+    [Obsolete("Используйте SendMessage(chat, type: \"text\")")]
+    public void SendTextMessage(Chat chat)
+    {
+        SendMessage(chat, type: "text");
+    }
+
+    [Obsolete("Используйте SendMessage(chat)")]
+    public void SendMultimediaMessage(Chat chat)
+    {
+        SendMessage(chat);
     }
 
     public void CreateContactChat()
