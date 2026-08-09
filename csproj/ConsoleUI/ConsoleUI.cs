@@ -39,7 +39,7 @@ public class ConsoleUI(Messenger messenger)
         {
             try
             {
-                string selected = SearchDialog(search => menuActions.Keys.Where(option => option.Contains(search)).ToList(), message);
+                string selected = new SearchDialog(search => menuActions.Keys.Where(option => option.Contains(search)).ToList(), message).Show();
 
                 Action selectedAction = menuActions[selected];
 
@@ -87,135 +87,6 @@ public class ConsoleUI(Messenger messenger)
         };
 
         ShowMenu(message, menuActions, "Выйти из чата");
-    }
-    
-    public string SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
-    {
-        bool isHasMessage = !string.IsNullOrWhiteSpace(message);
-        if (isHasMessage) Console.Write($"{message}: ");
-
-        string searchInstruction = "Напишите для поиска (ESC для выхода): ";
-
-        Console.Write("\x1b[?1049h"); // Включение альтернативного буфера
-        bool isInAltBuffer = true;
-
-        Console.SetCursorPosition(0, 0);
-
-        try
-        {
-            Console.CursorVisible = false;
-            int selectIndex = -1;
-            int offset = 0;
-
-            if (isHasMessage) Console.WriteLine(message);
-
-            Console.WriteLine(searchInstruction);
-            string searchText = "";
-
-            List<string> options = optionsUpdate(searchText);
-            options.Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
-                   .ToList()
-                   .ForEach(option => Console.WriteLine(option));
-
-            while (true)
-            {
-                if (options.Count is 0) throw new ArgumentException("Нет списка для выбора");
-
-                Console.SetCursorPosition(0, selectIndex - offset + (isHasMessage ? 2 : 1));
-
-                Console.Write("\u001b[30;47m"); // Черный текст на белом фоне
-
-                if (selectIndex != -1) Console.Write(options[selectIndex]);
-                else Console.Write(searchInstruction);
-
-                Console.Write("\u001b[0m"); // Сброс цветов
-
-                ConsoleKeyInfo consoleKey = Console.ReadKey(true);
-
-                switch (consoleKey.Key)
-                {
-                    case ConsoleKey.UpArrow:
-                        if (selectIndex > -1)
-                        {
-                            Console.SetCursorPosition(0, Console.CursorTop);
-                            Console.Write(options[selectIndex]);
-                            selectIndex--;
-
-                            if (offset > 0)
-                            {
-                                offset--;
-
-                                if (isHasMessage) Console.WriteLine(message);
-                                Console.WriteLine(searchInstruction);
-                                options.Skip(offset)
-                                    .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
-                                    .ToList()
-                                    .ForEach(option => Console.WriteLine(option));
-                            }
-                        }
-                        break;
-
-                    case ConsoleKey.DownArrow:
-                        if (selectIndex < options.Count - 1)
-                        {
-                            Console.SetCursorPosition(0, Console.CursorTop);
-                            if (selectIndex != -1) Console.Write(options[selectIndex]);
-                            else Console.Write(searchInstruction);
-
-                            selectIndex++;
-                            if (selectIndex - offset + 1 >= Console.WindowHeight - 1)
-                            {
-                                offset++;
-
-                                if (isHasMessage) Console.WriteLine(message);
-                                Console.WriteLine(searchInstruction);
-                                options.Skip(offset)
-                                    .Take(Console.WindowHeight - (isHasMessage ? 3 : 2))
-                                    .ToList()
-                                    .ForEach(option => Console.WriteLine(option));
-                            }
-                        }
-                        break;
-
-                    case ConsoleKey.Spacebar:
-                    case ConsoleKey.Enter:
-                        if (selectIndex == -1)
-                        {
-                            if (isHasMessage) Console.WriteLine(message);
-                            Console.Write(searchInstruction);
-
-                            Console.CursorVisible = false;
-                            string? input = Console.ReadLine();
-                            Console.CursorVisible = true;
-
-                            if (input == null) Console.WriteLine();
-                            searchText = input ?? "";
-
-                            options = optionsUpdate(searchText);
-                            options.ForEach(option => Console.WriteLine(option)); 
-                            break;
-                        }
-                        else
-                        {
-                            Console.Write("\x1b[?1049l");
-                            isInAltBuffer = false;
-
-                            string selected = options[selectIndex];
-
-                            Console.WriteLine(selected); // Вот это не выводится
-                            return selected;
-                        }
-                    case ConsoleKey.Escape:
-                        throw new OperationCanceledException("Отмена выбора");
-                }
-            }
-        }
-        finally
-        {
-            Console.CursorVisible = true;
-
-            if (isInAltBuffer) Console.Write("\x1b[?1049l");
-        }
     }
 
     public void ViewChatHistory(Chat chat)
@@ -297,18 +168,18 @@ public class ConsoleUI(Messenger messenger)
 
     private Chat ChooseChat(string message = "Выберите чат", List<Chat>? excludedChats = null)
     {
-        string chatName = SearchDialog(searchText => _messenger.GetChats(searchText)
+        string chatName = new SearchDialog(searchText => _messenger.GetChats(searchText)
                                                                .Except(excludedChats ?? [])
                                                                .Select(chat => chat.ChatName)
-                                                               .ToList(), message);
+                                                               .ToList(), message).Show();
         return _messenger.Chats.First(c => c.ChatName == chatName);
     }
 
     private User ChooseContact(Func<string, List<User>> usersUpdate, string message = "Выбурите контакт")
     {
-        string username = SearchDialog(searchText => usersUpdate(searchText).Where(u => !u.IsDeleted)
+        string username = new SearchDialog(searchText => usersUpdate(searchText).Where(u => !u.IsDeleted)
                                                                             .Select(u => u.Username)
-                                                                            .ToList(), message);
+                                                                            .ToList(), message).Show();
 
         if (username == _messenger.User.Username) return _messenger.User;
 
@@ -339,7 +210,7 @@ public class ConsoleUI(Messenger messenger)
             text = userInput;
         }
 
-        type ??= SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения");
+        type ??= new SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения").Show();
 
         if (dateTime is null)
         {
