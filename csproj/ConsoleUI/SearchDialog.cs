@@ -44,7 +44,7 @@ public class SearchDialog
 
             while (true)
             {
-                if (_options.Count is 0) throw new ArgumentException("Нет списка для выбора");
+                if (_options.Count is 0 && OptionsUpdate("").Count is 0) throw new ArgumentException("Нет списка для выбора");
 
                 WriteSelected();
 
