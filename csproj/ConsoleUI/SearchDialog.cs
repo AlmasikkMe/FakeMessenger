@@ -87,8 +87,9 @@ public class SearchDialog
                     case ConsoleKey.Enter:
                         if (_selectIndex == -1)
                         {
+                            Console.Clear();
                             WriteMessageLine();
-                            WriteInstructionLine();
+                            Console.Write(_searchInstruction);
 
                             Console.CursorVisible = false;
                             string? input = Console.ReadLine();
