@@ -39,7 +39,7 @@ public class ConsoleUI(Messenger messenger)
         {
             try
             {
-                string selected = new SearchDialog(search => menuActions.Keys.Where(option => option.Contains(search)).ToList(), message).Show();
+                string selected = new SearchDialog(menuActions.Keys.ToList()).Show();
 
                 Action selectedAction = menuActions[selected];
 
@@ -168,18 +168,21 @@ public class ConsoleUI(Messenger messenger)
 
     private Chat ChooseChat(string message = "Выберите чат", List<Chat>? excludedChats = null)
     {
-        string chatName = new SearchDialog(searchText => _messenger.GetChats(searchText)
-                                                               .Except(excludedChats ?? [])
-                                                               .Select(chat => chat.ChatName)
-                                                               .ToList(), message).Show();
+        List<string> chatsNames = _messenger.Chats
+                                            .Select(c => c.ChatName)
+                                            .ToList();
+
+        string chatName = new SearchDialog(chatsNames, message).Show();
         return _messenger.Chats.First(c => c.ChatName == chatName);
     }
 
-    private User ChooseContact(Func<string, List<User>> usersUpdate, string message = "Выбурите контакт")
+    private User ChooseUser(List<User> users, string message = "Выбурите контакт")
     {
-        string username = new SearchDialog(searchText => usersUpdate(searchText).Where(u => !u.IsDeleted)
-                                                                            .Select(u => u.Username)
-                                                                            .ToList(), message).Show();
+        List<string> usernames = users.Where(u => !u.IsDeleted)
+                                      .Select(u => u.Username)
+                                      .ToList();
+
+        string username = new SearchDialog(usernames, message).Show();
 
         if (username == _messenger.User.Username) return _messenger.User;
 
@@ -188,9 +191,9 @@ public class ConsoleUI(Messenger messenger)
 
     private User ChooseContact(string message = "Выберите контакт", List<User>? excludedUsers = null)
     {
-        return ChooseContact(searchText => _messenger.GetContacts(searchText)
-                                                     .Except(excludedUsers ?? [])
-                                                     .ToList());
+        return ChooseUser(_messenger.Contacts
+                                    .Except(excludedUsers ?? [])
+                                    .ToList());
     }
 
     public void SendMessage(Chat chat, User? sender = null, string? text = null, string? type = null, DateTime? dateTime = null)
@@ -198,7 +201,7 @@ public class ConsoleUI(Messenger messenger)
         string? userInput;
         Console.WriteLine("Введите / на любом из следующих этапов для выхода");
 
-        sender ??= ChooseContact(searchText => chat.GetMembers(searchText).Where(u => !u.IsDeleted).ToList(), "Выберете отправителя");
+        sender ??= ChooseUser(chat.Members.Where(u => !u.IsDeleted).ToList(), "Выберете отправителя");
 
         while (string.IsNullOrWhiteSpace(text))
         {
@@ -210,7 +213,7 @@ public class ConsoleUI(Messenger messenger)
             text = userInput;
         }
 
-        type ??= new SearchDialog(searchText => MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения").Show();
+        type ??= new SearchDialog(MessagesTypes.Select(type => type.Key).ToList(), "Выберите тип сообщения").Show();
 
         if (dateTime is null)
         {

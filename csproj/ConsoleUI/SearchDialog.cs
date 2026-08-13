@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace FakeMessenger.ConsoleUI;
+﻿namespace FakeMessenger.ConsoleUI;
 public class SearchDialog
 {
-    private List<string> _options;
+    private List<string[]> _options;
 
     private int _selectIndex = -1;
     private int _offset = 0;
@@ -21,12 +19,12 @@ public class SearchDialog
             else field = value.Trim();
         }
     }
-    public Func<string, List<string>> OptionsUpdate { get; set; }
+    public List<string> Options { get; set { field = value; UpdateOptions(); } }
 
-    public SearchDialog(Func<string, List<string>> optionsUpdate, string? message = null)
+    public SearchDialog(List<string> options, string? message = null)
     {
-        OptionsUpdate = optionsUpdate;
-        _options = OptionsUpdate(_searchText);
+        Options = options;
+        UpdateOptions();
         Message = message;
     }
 
@@ -42,9 +40,11 @@ public class SearchDialog
 
             WriteAll();
 
+            Console.SetCursorPosition(0, 0);
+
             while (true)
             {
-                if (_options.Count is 0 && OptionsUpdate("").Count is 0) throw new ArgumentException("Нет списка для выбора");
+                if (_options.Count is 0 && Options.Count is 0) throw new ArgumentException("Нет списка для выбора");
 
                 WriteSelected();
 
@@ -55,13 +55,36 @@ public class SearchDialog
                     case ConsoleKey.UpArrow:
                         if (_selectIndex > -1)
                         {
-                            Console.SetCursorPosition(0, Console.CursorTop);
-                            Console.Write(_options[_selectIndex]);
+                            int cursorTop = Message is null ? 1 : 2;
+
+                            foreach (var option in _options.Take(_selectIndex))
+                            {
+                                cursorTop += option.Length;
+                            }
+
+                            cursorTop -= _offset;
+
+                            Console.SetCursorPosition(0, cursorTop);
+
+                            foreach (var line in _options[_selectIndex])
+                            {
+                                Console.WriteLine(line);
+                            }
+
                             _selectIndex--;
 
                             if (_offset > 0)
                             {
-                                _offset--;
+                                int lines = Message is null ? 1 : 2;
+
+                                foreach (var option in _options.Take(_selectIndex + 1))
+                                {
+                                    lines += option.Length;
+                                }
+
+                                if (lines > Console.WindowHeight - 1) _offset = lines - Console.WindowHeight + 1;
+                                else _offset = 0;
+                                Console.Clear();
                                 WriteAll();
                             }
                         }
@@ -70,14 +93,44 @@ public class SearchDialog
                     case ConsoleKey.DownArrow:
                         if (_selectIndex < _options.Count - 1)
                         {
-                            Console.SetCursorPosition(0, Console.CursorTop);
-                            if (_selectIndex != -1) Console.Write(_options[_selectIndex]);
-                            else Console.Write(_searchInstruction);
+                            if (_selectIndex == -1)
+                            {
+                                WriteInstructionLine();
+                            }
+                            else
+                            {
+                                int cursorTop = Message is null ? 1 : 2;
+
+                                foreach (var option in _options.Take(_selectIndex))
+                                {
+                                    cursorTop += option.Length;
+                                }
+
+                                cursorTop -= _offset;
+
+                                Console.SetCursorPosition(0, cursorTop);
+
+                                foreach (var line in _options[_selectIndex])
+                                {
+                                    Console.WriteLine(line);
+                                }
+                            }
 
                             _selectIndex++;
-                            if (_selectIndex - _offset + 1 >= Console.WindowHeight - 1)
+
+                            int lines = Message is null ? 1 : 2;
+
+                            foreach (var option in _options.Take(_selectIndex + 1))
                             {
-                                _offset++;
+                                lines += option.Length;
+                            }
+
+                            lines -= _offset;
+
+                            if (lines >= Console.WindowHeight - 1)
+                            {
+                                _offset = lines + _offset - Console.WindowHeight + 1;
+                                Console.Clear();
                                 WriteAll();
                             }
                         }
@@ -91,21 +144,28 @@ public class SearchDialog
                             WriteMessageLine();
                             Console.Write(_searchInstruction);
 
-                            Console.CursorVisible = false;
-                            string? input = Console.ReadLine();
                             Console.CursorVisible = true;
+                            string? input = Console.ReadLine();
+                            Console.CursorVisible = false;
 
                             if (input == null) Console.WriteLine();
-                            _searchText = input ?? "";
+                            _searchText = input ?? string.Empty;
+                            UpdateOptions();
 
                             WriteOptionsLines();
+
+                            _selectIndex = 0;
+                            _offset = 0;
+
+                            Console.SetCursorPosition(0, 1);
+
                             break;
                         }
                         else
                         {
                             TurnOffAltBuffer();
 
-                            string selected = _options[_selectIndex];
+                            string selected = Options[_selectIndex];
 
                             Console.WriteLine(selected);
                             return selected;
@@ -129,32 +189,77 @@ public class SearchDialog
 
     private void WriteSelected()
     {
-        Console.SetCursorPosition(0, _selectIndex - _offset + (Message is null ? 1 : 2));
+        int cursorTop = Message is null ? 0 : 1;
+
+        if (_selectIndex != -1)
+        {
+            cursorTop++;
+
+            foreach (var option in _options.Take(_selectIndex))
+            {
+                cursorTop += option.Length;
+            }
+
+            cursorTop -= _offset;
+        }
+
+        Console.SetCursorPosition(0, cursorTop);
 
         Console.Write("\u001b[30;47m"); // Черный текст на белом фоне
 
-        if (_selectIndex != -1) Console.Write(_options[_selectIndex]);
+        if (_selectIndex != -1)
+        {
+            foreach (var line in _options[_selectIndex])
+            {
+                Console.WriteLine(line);
+            }
+        }
         else Console.Write(_searchInstruction);
 
         Console.Write("\u001b[0m"); // Сброс цветов
     }
 
-    private void WriteOptionsLines()
+    private void WriteOptionsLines() 
     {
-        _options = OptionsUpdate(_searchText);
-        _options.Skip(_offset)
-                .Take(Console.WindowHeight - (Message is null ? 2 : 3))
-                .ToList()
-                .ForEach(option => Console.WriteLine(option));
+        int skipped = 0;
+
+        _options.ToList()
+                .ForEach(option => 
+                {
+                    foreach (var line in option)
+                    {
+                        if (skipped < _offset)
+                        { 
+                            skipped++;
+                            continue;
+                        } 
+
+                        if (Console.CursorTop + 1 >= Console.WindowHeight) return;
+                        Console.WriteLine(line);
+                    }
+                });
+    }
+
+    private void UpdateOptions()
+    {
+        _options = Options.Where(option => option.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+                          .Select(SplitOption)
+                          .ToList();
+
+        static string[] SplitOption(string option) => option.Split('\n')
+                                                     .SelectMany(l => l.Chunk(Console.WindowWidth))
+                                                     .Select(c => new string(c).Trim())
+                                                     .ToArray();
     }
 
     private void WriteMessageLine()
     {
-        if (Message is not null) Console.WriteLine(Message);
+        if (Message is not null) Console.WriteLine(Message); 
     }
 
     private void WriteInstructionLine()
     {
+        Console.SetCursorPosition(0, Message is null ? 0 : 1);
         Console.WriteLine(_searchInstruction);
     }
         
