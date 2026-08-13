@@ -1,4 +1,5 @@
 ﻿using FakeMessenger.Core;
+using System.Text;
 
 namespace FakeMessenger.ConsoleUI;
 
@@ -31,11 +32,13 @@ public class ConsoleUI(Messenger messenger)
         MainMenu();
     }
 
+    private bool _isInMenu = false;
+
     public void ShowMenu(string? message, Dictionary<string, Action> menuActions, string exitOption = "Выйти")
     {
-        bool isInMenu = true;
-        menuActions.Add(exitOption, () => isInMenu = false);
-        while (isInMenu)
+        _isInMenu = true;
+        menuActions.Add(exitOption, () => _isInMenu = false);
+        while (_isInMenu)
         {
             try
             {
@@ -48,12 +51,17 @@ public class ConsoleUI(Messenger messenger)
                 if (Console.CursorLeft != 0) Console.WriteLine();
                 Console.WriteLine();
             }
+            catch (OperationCanceledException)
+            {
+                _isInMenu = false;
+            }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.ReadLine();
             }
         }
+        _isInMenu = true;
     }
 
     public void MainMenu()
@@ -89,22 +97,52 @@ public class ConsoleUI(Messenger messenger)
         ShowMenu(message, menuActions, "Выйти из чата");
     }
 
+    public void MessageCommandMenu(Message message, Chat chat)
+    {
+        string prompt = $"Что вы хотите с выбранным сообщением?";
+
+        Dictionary<string, Action> menuActions = new()
+        {
+            { "Посмотреть выбранное сообщение", () => { Console.WriteLine(MessageToString(message)); } },
+            { "Удалить сообщение", () => { chat.DeleteMessage(message); _isInMenu = false; } },
+        };
+
+        ShowMenu(prompt, menuActions, "Вернуться в чат");
+    }
+
     public void ViewChatHistory(Chat chat)
     {
-        for (int i = 0; i < chat.Messages.Count; i++)
-        {
-            if (i != 0) Console.WriteLine();
+        Dictionary<string, Message> messages = [];
 
-            Message? message = chat.Messages[i];
-            Console.WriteLine($"{message.Sender.FullName}, [{message.DateTime:dd.MM.yyyy HH:mm}]");
-            if (message.Type != "text")
-            {
-                Console.Write($"[{MessagesTypes[message.Type].Emoji}  ");
-                if (message.Text == string.Empty) Console.WriteLine($"{MessagesTypes[message.Type].Name}]");
-                else Console.WriteLine($"{message.Text}]");
-            }
-            if (!message.Text.IsWhiteSpace()) Console.WriteLine(message.Text);
+        foreach (var message in chat.Messages)
+        {  
+            messages.Add(MessageToString(message), message);
         }
+
+        Message selectedMessage = messages[new SearchDialog(messages.Keys.ToList(), "Выберите сообщение").Show()];
+
+        MessageCommandMenu(selectedMessage, chat);
+
+        messages.Clear();
+    }
+
+    private string MessageToString(Message message)
+    {
+        StringBuilder stringBuilder = new();
+
+        stringBuilder.AppendLine($"{message.Sender.FullName}, [{message.DateTime:dd.MM.yyyy HH:mm}]");
+
+        if (message.Type != "text")
+        {
+            stringBuilder.Append($"[{MessagesTypes[message.Type].Emoji}  ");
+
+            if (message.Text == string.Empty) stringBuilder.AppendLine($"{MessagesTypes[message.Type].Name}]");
+            else stringBuilder.AppendLine($"{message.Text}]");
+        }
+
+        if (message.Text != string.Empty) stringBuilder.AppendLine(message.Text);
+
+        return stringBuilder.ToString();
     }
 
     public void NewContact()
