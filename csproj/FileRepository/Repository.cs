@@ -1,4 +1,5 @@
 ﻿using FakeMessenger.Core;
+using System.IO;
 
 namespace FakeMessenger.FileRepository
 {
