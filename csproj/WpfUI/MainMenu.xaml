@@ -4,9 +4,49 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FakeMessenger.WpfUI"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         mc:Ignorable="d"
-        Title="MainMenu" Height="450" Width="800">
+        WindowStyle="SingleBorderWindow"
+        Title="FakeMessenger" Height="800" Width="450" MinHeight="280" MinWidth="400">
     <Grid>
-        
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Заголовок -->
+            <Grid Grid.Row="0" Background="Transparent">
+                <Viewbox HorizontalAlignment="Left">
+                    <TextBlock Text="FakeMessenger" FontWeight="Bold"/>
+                </Viewbox>
+            </Grid>
+            <!-- Поиск чатов -->
+            <Border Background="LightGray" Grid.Row="2" CornerRadius="25">
+                <TextBox BorderBrush="Transparent" Margin="20, 10" Background="#00000000" VerticalContentAlignment="Center" FontSize="21"/>
+            </Border>
+        </Grid>
+
+        <!-- Кнопка "Новое сообщение" -->
+        <Grid Margin="20"
+              VerticalAlignment="Bottom" HorizontalAlignment="Right"
+              Height="50" Width="50">
+            <Ellipse Fill="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}"/>
+
+            <Viewbox Margin="13" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Canvas Height="48" Width="48">
+                    <Path Fill="White" 
+                            Data="M44,24 C44,35.0457 35.0457,44 24,44 C18.0265,44 4,44 4,44 C4,44 4,29.0722 4,24 C4,12.9543 12.9543,4 24,4 C35.0457,4 44,12.9543 44,24 Z"/>
+
+                    <Path Stroke="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" 
+                            StrokeThickness="4" 
+                            StrokeStartLineCap="Round" 
+                            StrokeEndLineCap="Round"
+                            Data="M24,15 V33 M15,24 H33"/>
+                </Canvas>
+            </Viewbox>
+        </Grid>
     </Grid>
 </Window>
