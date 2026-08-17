@@ -3,7 +3,7 @@ using System.Text;
 
 namespace FakeMessenger.UI.ConsoleUI;
 
-public class ConsoleUI(Messenger messenger)
+public class ConsoleUI(Messenger messenger) : IUserInterface
 {
     Dictionary<string, (string Emoji, string Name, bool IsWithTime, bool IsWithText)> MessagesTypes = new() {
         { "photo",        ("🖼", "Фотография",          false, true ) },
