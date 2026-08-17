@@ -1,7 +1,7 @@
 ﻿using FakeMessenger.Core;
 using System.Text;
 
-namespace FakeMessenger.ConsoleUI;
+namespace FakeMessenger.UI.ConsoleUI;
 
 public class ConsoleUI(Messenger messenger)
 {

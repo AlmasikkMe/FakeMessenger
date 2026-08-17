@@ -1,7 +1,7 @@
-﻿using FakeMessenger.ConsoleUI;
+﻿using FakeMessenger.UI.ConsoleUI;
 using FakeMessenger.Core;
 using FakeMessenger.FileRepository.Xml;
-using FakeMessenger.WpfUI;
+using FakeMessenger.UI.WpfUI;
 
 XmlSerializer xmlSerializer = new();
 
