@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FakeMessenger.UI
+﻿namespace FakeMessenger.UI
 {
     public interface IUserInterface
     {
