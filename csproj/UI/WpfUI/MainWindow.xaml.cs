@@ -1,5 +1,5 @@
-﻿using Accessibility;
-using System.Windows;
+﻿using System.Windows;
+using FakeMessenger.UI.WpfUI.Pages;
 
 namespace FakeMessenger.UI.WpfUI;
 
@@ -9,6 +9,11 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        MainFrame.Navigate(new MainPage());
+        Loaded += MainWindow_Loaded;
+    }
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        MainFrame.Navigate(new ChatsPage());
     }
 }
