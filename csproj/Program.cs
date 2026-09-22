@@ -10,6 +10,6 @@ XmlFileRepository xmlFileRepository = new(xmlSerializer);
 
 Messenger messenger = new(xmlFileRepository);
 
-IUserInterface userInterface = new WpfUI(messenger);
+// IUserInterface userInterface = new WpfUI(messenger);
 
-userInterface.Run();
+// userInterface.Run();
