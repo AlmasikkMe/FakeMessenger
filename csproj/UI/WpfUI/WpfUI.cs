@@ -11,7 +11,9 @@ public class WpfUI : IUserInterface
         _messenger = messenger;
     }
 
-    public void Run()
+    public void Run() => Run(isJoin: true);
+
+    public void Run(bool isJoin)
     {
         Thread thread = new(() =>
         {
@@ -22,6 +24,6 @@ public class WpfUI : IUserInterface
         
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
-        thread.Join();
+        if (isJoin) thread.Join();
     }
 }

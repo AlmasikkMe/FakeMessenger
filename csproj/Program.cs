@@ -1,6 +1,5 @@
 ﻿using FakeMessenger.Core;
 using FakeMessenger.FileRepository.Xml;
-using FakeMessenger.UI.WpfUI;
 using FakeMessenger.UI.ConsoleUI;
 using FakeMessenger.UI;
 
@@ -10,6 +9,6 @@ XmlFileRepository xmlFileRepository = new(xmlSerializer);
 
 Messenger messenger = new(xmlFileRepository);
 
-IUserInterface userInterface = new WpfUI(messenger);
+IUserInterface userInterface = new ConsoleUI(messenger);
 
 userInterface.Run();

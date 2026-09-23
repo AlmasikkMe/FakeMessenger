@@ -84,6 +84,9 @@ public class ConsoleUI : IUserInterface
             { "Сохранить",  Save },
             { "Загрузить", Load },
             { "Создать чат с контактом", CreateContactChat },
+#if WINDOWS
+            { "Перейти в WpfUI-режим",  OpenWpf}
+#endif
         };
 
         ShowMenu(message, menuActions, "Выйти без сохранения");
@@ -313,4 +316,16 @@ public class ConsoleUI : IUserInterface
 
         Console.ReadKey(true);
     }
+
+#if WINDOWS
+    public void OpenWpf()
+    {
+        WpfUI.WpfUI wpfUI = new(_messenger);
+        wpfUI.Run(isJoin: false);
+        Console.WriteLine("Окно с интерфейсом открыто");
+        Console.WriteLine("Во избежание закрытия окна с интерфейсом не закрывайте окно консоли");
+        Console.WriteLine("Вы можете продолжать использовать это окно");
+        Console.Read();
+    }
+#endif
 }
