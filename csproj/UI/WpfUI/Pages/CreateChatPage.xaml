@@ -8,6 +8,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Text="Создание чата" FontSize="24" FontWeight="Bold" Margin="0,0,0,10" />
@@ -34,10 +35,10 @@
 
         <!-- Поля для группового чата -->
         <StackPanel Grid.Row="3" x:Name="GroupFieldsPanel" Visibility="Collapsed" Margin="0,10,0,0">
-            <TextBox x:Name="ChatNameTextBox" Margin="0,0,0,5" Padding="5" 
-                     Tag="Уникальное имя группы (@...)" />
-            <TextBox x:Name="GroupNameTextBox" Margin="0,0,0,5" Padding="5" 
-                     Tag="Название группы" />
+            <TextBlock Text="Уникальное имя группы (@...)" Margin="0,0,0,5" />
+            <TextBox x:Name="ChatNameTextBox" Margin="0,0,0,5" Padding="5" />
+            <TextBlock Text="Название группы" Margin="0,0,0,5" />
+            <TextBox x:Name="GroupNameTextBox" Margin="0,0,0,5" Padding="5" />
         </StackPanel>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">

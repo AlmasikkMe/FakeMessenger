@@ -6,25 +6,26 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Text="Новый контакт" FontSize="24" FontWeight="Bold" Margin="0,0,0,15" />
 
-        <TextBlock Grid.Row="1" Text="Имя пользователя (@...):" Margin="0,0,0,5" />
-        <TextBox Grid.Row="2" x:Name="UsernameTextBox" Padding="5" Margin="0,0,0,10" />
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="Имя пользователя (@...):" Margin="0,0,0,5" />
+            <TextBox x:Name="UsernameTextBox" Padding="5" Margin="0,0,0,10" />
 
-        <TextBlock Grid.Row="3" Text="Имя:" Margin="0,0,0,5" />
-        <TextBox Grid.Row="4" x:Name="FirstNameTextBox" Padding="5" Margin="0,0,0,10" />
+            <TextBlock Text="Имя:" Margin="0,0,0,5" />
+            <TextBox x:Name="FirstNameTextBox" Padding="5" Margin="0,0,0,10" />
 
-        <TextBlock Grid.Row="5" Text="Фамилия:" Margin="0,0,0,5" />
-        <TextBox Grid.Row="6" x:Name="LastNameTextBox" Padding="5" Margin="0,0,0,15" />
+            <TextBlock Text="Фамилия:" Margin="0,0,0,5" />
+            <TextBox x:Name="LastNameTextBox" Padding="5" Margin="0,0,0,15" />
+        </StackPanel>
 
-        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Назад" Click="Back_Click" Margin="0,0,10,0" Padding="15,5" />
             <Button Content="Создать" Click="Create_Click" Padding="15,5" />
-        </StackPanel>
+        </StackPanel> 
     </Grid>
 </Page>
