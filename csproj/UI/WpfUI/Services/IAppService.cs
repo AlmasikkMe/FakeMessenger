@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using FakeMessenger.Core;
 
 namespace FakeMessenger.UI.WpfUI.Services;
@@ -9,8 +10,8 @@ namespace FakeMessenger.UI.WpfUI.Services;
 public interface IAppService
 {
     User CurrentUser { get; }
-    IReadOnlyList<Chat> Chats { get; }
-    IReadOnlyList<User> Contacts { get; }
+    ObservableCollection<Chat> Chats { get; }
+    ObservableCollection<User> Contacts { get; }
 
     void CreateContact(string username, string firstName, string lastName);
     void CreateGroup(string chatName, string groupName, List<User> members);
