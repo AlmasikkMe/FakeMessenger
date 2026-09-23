@@ -39,4 +39,19 @@ public partial class ChatSelectionPage : Page
     {
         NavigationService.Navigate(new CreateContactPage());
     }
+
+    private void Save_Click(object sender, RoutedEventArgs e)
+    {
+        App.AppService.Save();
+    }
+
+    private void Load_Click(object sender, RoutedEventArgs e)
+    {
+        try { App.AppService.Load(); }
+        catch (Exception ex)
+        { 
+            MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        RefreshChats();
+    }
 }
