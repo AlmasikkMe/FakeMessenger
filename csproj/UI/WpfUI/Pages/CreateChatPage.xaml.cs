@@ -50,22 +50,23 @@ public partial class CreateChatPage : Page
     {
         if (ContactsListBox.SelectedItem is not User contact)
         {
-            MessageBox.Show("Выберите контакт.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Выберите контакт.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
-        App.AppService.CreatePersonalChat(contact);
-        NavigationService.GoBack();
+        try
+        {
+            App.AppService.CreatePersonalChat(contact);
+            NavigationService.GoBack();
+        }
+        catch (Exception ex)
+        {            
+            MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void CreateGroupChat()
-    {
-        if (ContactsListBox.SelectedItems.Count == 0)
-        {
-            MessageBox.Show("Выберите хотя бы одного участника.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
+    {   
         string chatName = ChatNameTextBox.Text.Trim();
         string groupName = GroupNameTextBox.Text.Trim();
 
@@ -83,7 +84,7 @@ public partial class CreateChatPage : Page
             App.AppService.CreateGroup(chatName, groupName, members);
             NavigationService.GoBack();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
