@@ -1,0 +1,49 @@
+<Page x:Class="FakeMessenger.UI.WpfUI.Pages.CreateChatPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Создать чат">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Создание чата" FontSize="24" FontWeight="Bold" Margin="0,0,0,10" />
+
+        <!-- Переключатель режима -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            <RadioButton x:Name="PersonalChatRadio" Content="Личный чат" GroupName="ChatType" 
+                         IsChecked="True" Checked="ChatType_Changed" Margin="0,0,20,0" />
+            <RadioButton x:Name="GroupChatRadio" Content="Групповой чат" GroupName="ChatType" 
+                         Checked="ChatType_Changed" />
+        </StackPanel>
+
+        <!-- Список контактов -->
+        <ListBox Grid.Row="2" x:Name="ContactsListBox" SelectionMode="Extended">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding FullName}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Username}" Foreground="Gray" FontSize="12" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Поля для группового чата -->
+        <StackPanel Grid.Row="3" x:Name="GroupFieldsPanel" Visibility="Collapsed" Margin="0,10,0,0">
+            <TextBlock Text="Уникальное имя группы (@...)" Margin="0,0,0,5" />
+            <TextBox x:Name="ChatNameTextBox" Margin="0,0,0,5" Padding="5" />
+            <TextBlock Text="Название группы" Margin="0,0,0,5" />
+            <TextBox x:Name="GroupNameTextBox" Margin="0,0,0,5" Padding="5" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Назад" Click="Back_Click" Margin="0,0,10,0" Padding="15,5" />
+            <Button Content="Создать" Click="Create_Click" Padding="15,5" />
+        </StackPanel>
+    </Grid>
+</Page>

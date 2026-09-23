@@ -1,6 +1,7 @@
-﻿using FakeMessenger.ConsoleUI;
-using FakeMessenger.Core;
+﻿using FakeMessenger.Core;
 using FakeMessenger.FileRepository.Xml;
+using FakeMessenger.UI.ConsoleUI;
+using FakeMessenger.UI;
 
 XmlSerializer xmlSerializer = new();
 
@@ -8,6 +9,6 @@ XmlFileRepository xmlFileRepository = new(xmlSerializer);
 
 Messenger messenger = new(xmlFileRepository);
 
-ConsoleUI consoleUI = new(messenger);
+IUserInterface userInterface = new ConsoleUI(messenger);
 
-consoleUI.Run();
+userInterface.Run();

@@ -1,9 +1,9 @@
 ﻿using FakeMessenger.Core;
 using System.Text;
 
-namespace FakeMessenger.ConsoleUI;
+namespace FakeMessenger.UI.ConsoleUI;
 
-public class ConsoleUI(Messenger messenger)
+public class ConsoleUI : IUserInterface
 {
     Dictionary<string, (string Emoji, string Name, bool IsWithTime, bool IsWithText)> MessagesTypes = new() {
         { "photo",        ("🖼", "Фотография",          false, true ) },
@@ -22,9 +22,15 @@ public class ConsoleUI(Messenger messenger)
         { "gift",         ("🎁", "Подарок",             false, false) },
     };
 
-    private Messenger _messenger = messenger;
+    private Messenger _messenger;
 
     public string ExitCommand = "/";
+
+    public ConsoleUI(Messenger messenger)
+    {
+        _messenger = messenger;
+    }
+
     public void Run()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -78,6 +84,9 @@ public class ConsoleUI(Messenger messenger)
             { "Сохранить",  Save },
             { "Загрузить", Load },
             { "Создать чат с контактом", CreateContactChat },
+#if WINDOWS
+            { "Перейти в WpfUI-режим",  OpenWpf}
+#endif
         };
 
         ShowMenu(message, menuActions, "Выйти без сохранения");
@@ -307,4 +316,16 @@ public class ConsoleUI(Messenger messenger)
 
         Console.ReadKey(true);
     }
+
+#if WINDOWS
+    public void OpenWpf()
+    {
+        WpfUI.WpfUI wpfUI = new(_messenger);
+        wpfUI.Run(isJoin: false);
+        Console.WriteLine("Окно с интерфейсом открыто");
+        Console.WriteLine("Во избежание закрытия окна с интерфейсом не закрывайте окно консоли");
+        Console.WriteLine("Вы можете продолжать использовать это окно");
+        Console.Read();
+    }
+#endif
 }

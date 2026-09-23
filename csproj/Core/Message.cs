@@ -2,8 +2,8 @@
 
 public class Message(User sender)
 {
-    public User Sender = sender;
-    public string Text = "";
-    public string Type = "text";
-    public DateTime DateTime = DateTime.Now;
+    public User Sender { get; set; } = sender;
+    public string Text { get; set; } = "";
+    public string Type { get; set; } = "text";
+    public DateTime DateTime { get; set; } = DateTime.Now;
 }

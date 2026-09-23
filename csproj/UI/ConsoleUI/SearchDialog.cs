@@ -1,4 +1,4 @@
-﻿namespace FakeMessenger.ConsoleUI;
+﻿namespace FakeMessenger.UI.ConsoleUI;
 public class SearchDialog
 {
     private List<string[]> _options;
