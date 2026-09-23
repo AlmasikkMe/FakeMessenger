@@ -9,13 +9,17 @@ on:
 jobs:
 
   publish:
-  
+
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        runtime: [win-x64, linux-x64]
-        
+        include:
+          - runtime: win-x64
+            framework: net10.0-windows
+          - runtime: linux-x64
+            framework: net10.0
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -26,15 +30,17 @@ jobs:
         dotnet-version: '10.0'
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./csproj/FakeMessenger.csproj -r ${{ matrix.runtime }}
 
     - name: Publish application
       run: >
-        dotnet publish -c Release 
-        -r ${{ matrix.runtime }} 
-        --self-contained true 
-        -p:PublishSingleFile=true 
-        -p:PublishReadyToRun=true 
+        dotnet publish ./csproj/FakeMessenger.csproj
+        -c Release
+        -f ${{ matrix.framework }}
+        -r ${{ matrix.runtime }}
+        --self-contained true
+        -p:PublishSingleFile=true
+        -p:PublishReadyToRun=true
         -o ./publish/${{ matrix.runtime }}
 
     - name: Upload Build Artifacts
@@ -42,5 +48,3 @@ jobs:
       with:
         name: dotnet-app-${{ matrix.runtime }}
         path: ./publish/${{ matrix.runtime }}/
-
-
