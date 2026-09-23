@@ -34,9 +34,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBox x:Name="MessageTextBox" Padding="5" FontSize="14" KeyDown="MessageTextBox_KeyDown" />
-            <Button Grid.Column="1" Content="Отправить" Click="Send_Click" Margin="10,0,0,0" Padding="15,5" />
+            <ComboBox Grid.Column="1" x:Name="MessageSenderComboBox" Margin="10,0,0,0" Padding="5" />
+            <Button Grid.Column="2" Content="Отправить" Click="Send_Click" Margin="10,0,0,0" Padding="15,5" />
         </Grid>
     </Grid>
 </Page>

@@ -13,6 +13,8 @@ public partial class ChatPage : Page
     {
         InitializeComponent();
         _chat = chat;
+        MessageSenderComboBox.ItemsSource = chat.Members.Select(u => u.FullName);
+        MessageSenderComboBox.SelectedIndex = 0;
         Loaded += ChatPage_Loaded;
     }
 
@@ -49,13 +51,14 @@ public partial class ChatPage : Page
 
     private void SendMessage()
     {
+        User sender = _chat.Members.First(u => u.FullName == MessageSenderComboBox.SelectedItem.ToString());
         string text = MessageTextBox.Text.Trim();
         if (string.IsNullOrEmpty(text))
         {
             return;
         }
 
-        App.AppService.SendMessage(_chat, text);
+        App.AppService.SendMessage(sender, _chat, text);
         MessageTextBox.Clear();
         RefreshMessages();
     }

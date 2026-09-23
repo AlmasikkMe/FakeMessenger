@@ -40,9 +40,9 @@ internal sealed class MessengerService : IAppService
         _messenger.AddChat(chat);
         UpdateData();
     }
-    public void SendMessage(Chat chat, string text, string type = "text")
+    public void SendMessage(User sender, Chat chat, string text, string type = "text")
     {
-        chat.AddMessage(CurrentUser, text, type, DateTime.Now);
+        chat.AddMessage(sender, text, type, DateTime.Now);
     }
     public void RemoveChat(Chat chat)
     {
