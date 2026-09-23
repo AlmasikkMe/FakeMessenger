@@ -30,7 +30,7 @@ public partial class CreateChatPage : Page
 
         // В режиме личного чата выбираем только один контакт
         ContactsListBox.SelectionMode = GroupChatRadio.IsChecked == true
-            ? SelectionMode.Extended
+            ? SelectionMode.Multiple
             : SelectionMode.Single;
     }
 
