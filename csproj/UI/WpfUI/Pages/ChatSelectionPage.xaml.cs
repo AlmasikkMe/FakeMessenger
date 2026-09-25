@@ -54,4 +54,15 @@ public partial class ChatSelectionPage : Page
         }
         RefreshChats();
     }
+
+    private void ChatDelete_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem)
+        {
+            if (menuItem.DataContext is Chat currentChat)
+            {
+                App.AppService.RemoveChat(currentChat);
+            }
+        }
+    }
 }

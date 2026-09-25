@@ -12,10 +12,17 @@
         <TextBlock Text="Мои чаты" FontSize="24" FontWeight="Bold" Margin="0,0,0,10" />
 
         <ListView Grid.Row="1" x:Name="ChatsListView" 
-                  MouseDoubleClick="ChatsListView_MouseDoubleClick">
+                  MouseDoubleClick="ChatsListView_MouseDoubleClick"
+                  HorizontalContentAlignment="Stretch">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
+                        <StackPanel.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Удалить" Click="ChatDelete_Click" />
+                            </ContextMenu>  
+                        </StackPanel.ContextMenu>
+                        
                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                         <TextBlock Text="{Binding ChatName}" Foreground="Gray" FontSize="12" />
                     </StackPanel>
