@@ -14,6 +14,8 @@ public partial class ChatPage : Page
     public ChatPage(Chat chat)
     {
         InitializeComponent();
+        
+        MessageDateTimePicker.Value = DateTime.Now;
         _chat = chat;
         MessageSenderComboBox.ItemsSource = chat.Members.Select(u => u.FullName);
         MessageSenderComboBox.SelectedIndex = 0;
@@ -62,12 +64,13 @@ public partial class ChatPage : Page
 
         if (_editing is null)
         {
-            App.AppService.SendMessage(sender, _chat, text);
+            App.AppService.SendMessage(sender, _chat, text, dateTime: MessageDateTimePicker.Value);
         }
         else
         {
             _editing.Text = text;
             _editing.Sender = sender;
+            _editing.DateTime = MessageDateTimePicker.Value ?? DateTime.Now;
             _editing = null;
         }
 
@@ -103,6 +106,8 @@ public partial class ChatPage : Page
         {
             _editing = message;
             MessageTextBox.Text = message.Text;
+            MessageSenderComboBox.SelectedItem = message.Sender.FirstName;
+            MessageDateTimePicker.Value = message.DateTime;
         }
     }
 

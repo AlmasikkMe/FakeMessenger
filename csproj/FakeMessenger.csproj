@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -18,12 +18,15 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <Compile               Remove="UI\WpfUI\**\*" />
-    <Page                  Remove="UI\WpfUI\**\*" />
+    <Compile Remove="UI\WpfUI\**\*" />
+    <Page Remove="UI\WpfUI\**\*" />
     <ApplicationDefinition Remove="UI\WpfUI\**\*" />
-    <None                  Remove="UI\WpfUI\**\*" />
-    <Content               Remove="UI\WpfUI\**\*" />
-    <EmbeddedResource      Remove="UI\WpfUI\**\*" />
+    <None Remove="UI\WpfUI\**\*" />
+    <Content Remove="UI\WpfUI\**\*" />
+    <EmbeddedResource Remove="UI\WpfUI\**\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="5.1.2" />
   </ItemGroup>
 
 </Project>
