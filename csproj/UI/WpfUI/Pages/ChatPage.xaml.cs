@@ -67,4 +67,28 @@ public partial class ChatPage : Page
     {
         NavigationService.GoBack();
     }
+
+    private void MessageCopy_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem)
+        {
+            if (menuItem.DataContext is Message currentMessage)
+            {
+                Clipboard.SetText(currentMessage.Text); 
+            }
+        }
+    }
+
+    private void MessageDelete_Click(object sender, RoutedEventArgs e)
+    {
+        
+        if (sender is MenuItem menuItem)
+        {
+            if (menuItem.DataContext is Message currentMessage)
+            {
+                _chat.DeleteMessage(currentMessage);
+                RefreshMessages();
+            }
+        }
+    }
 }

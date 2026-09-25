@@ -15,16 +15,28 @@
         </StackPanel>
 
         <ListBox Grid.Row="1" x:Name="MessagesListBox" 
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="2" Padding="8" CornerRadius="5" Background="#F0F0F0">
-                        <StackPanel>
-                            <TextBlock Text="{Binding Sender.FullName}" FontWeight="SemiBold" Foreground="#333" />
-                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,4,0,0" />
-                            <TextBlock Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
-                                       FontSize="10" Foreground="Gray" Margin="0,4,0,0" />
-                        </StackPanel>
+                    <Border Background="Transparent">
+                        <Border.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Копировать" Click="MessageCopy_Click" />
+                                <MenuItem Header="Удалить" Click="MessageDelete_Click" />
+                            </ContextMenu>
+                        </Border.ContextMenu>
+
+                        <Border Margin="2" Padding="8"
+                                CornerRadius="5" Background="#F0F0F0"
+                                HorizontalAlignment="Left">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Sender.FullName}" FontWeight="SemiBold" Foreground="#333" />
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                <TextBlock Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
+                                        FontSize="10" Foreground="Gray" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
                     </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
