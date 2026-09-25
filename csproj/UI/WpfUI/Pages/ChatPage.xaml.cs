@@ -9,6 +9,7 @@ namespace FakeMessenger.UI.WpfUI.Pages;
 public partial class ChatPage : Page
 {
     private readonly Chat _chat;
+    private Message? _editing;
 
     public ChatPage(Chat chat)
     {
@@ -54,12 +55,22 @@ public partial class ChatPage : Page
     {
         User sender = _chat.Members.First(u => u.FullName == MessageSenderComboBox.SelectedItem.ToString());
         string text = MessageTextBox.Text.Trim();
-        if (string.IsNullOrEmpty(text))
+        if (text.IsWhiteSpace())
         {
             return;
         }
 
-        App.AppService.SendMessage(sender, _chat, text);
+        if (_editing is null)
+        {
+            App.AppService.SendMessage(sender, _chat, text);
+        }
+        else
+        {
+            _editing.Text = text;
+            _editing.Sender = sender;
+            _editing = null;
+        }
+
         MessageTextBox.Clear();
         RefreshMessages();
     }
@@ -84,6 +95,15 @@ public partial class ChatPage : Page
             MessageBox.Show("Не удалось получить доступ к буферу обмена. Попробуйте еще раз.");
         }
 
+    }
+
+    private void MessageEdit_Click(object sender, RoutedEventArgs e)
+    {
+        if (MessagesListBox.SelectedItem is Message message)
+        {
+            _editing = message;
+            MessageTextBox.Text = message.Text;
+        }
     }
 
     private void MessageDelete_Click(object sender, RoutedEventArgs e)

@@ -24,6 +24,7 @@
                         <Border.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Копировать" Click="MessageCopy_Click" />
+                                <MenuItem Header="Изменить" Click="MessageEdit_Click" />
                                 <MenuItem Header="Удалить" Click="MessageDelete_Click" />
                             </ContextMenu>
                         </Border.ContextMenu>
