@@ -62,6 +62,7 @@ public partial class ChatSelectionPage : Page
             if (menuItem.DataContext is Chat currentChat)
             {
                 App.AppService.RemoveChat(currentChat);
+                RefreshChats();
             }
         }
     }

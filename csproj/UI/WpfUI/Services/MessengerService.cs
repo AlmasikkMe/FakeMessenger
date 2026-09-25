@@ -47,6 +47,7 @@ internal sealed class MessengerService : IAppService
     public void RemoveChat(Chat chat)
     {
         _messenger.RemoveChat(chat);
+        UpdateData();
     }
     public void RemoveContact(User contact)
     {
