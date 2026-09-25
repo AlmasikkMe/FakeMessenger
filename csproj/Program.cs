@@ -3,12 +3,22 @@ using FakeMessenger.FileRepository.Xml;
 using FakeMessenger.UI.ConsoleUI;
 using FakeMessenger.UI;
 
-XmlSerializer xmlSerializer = new();
+try
+{
+    XmlSerializer xmlSerializer = new();
 
-XmlFileRepository xmlFileRepository = new(xmlSerializer);
+    XmlFileRepository xmlFileRepository = new(xmlSerializer);
 
-Messenger messenger = new(xmlFileRepository);
+    Messenger messenger = new(xmlFileRepository);
 
-IUserInterface userInterface = new ConsoleUI(messenger);
+    IUserInterface userInterface = new ConsoleUI(messenger);
 
-userInterface.Run();
+    userInterface.Run();
+}
+finally
+{
+#if WINDOWS
+    System.Windows.Application app = System.Windows.Application.Current;
+    app?.Dispatcher.Invoke(() => app.Shutdown());
+#endif
+}

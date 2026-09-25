@@ -17,8 +17,24 @@ public class WpfUI : IUserInterface
     {
         Thread thread = new(() =>
         {
-            MainWindow mainWindow = new();
-            App app = new(_messenger);
+            MainWindow? mainWindow = null;
+
+            if (System.Windows.Application.Current != null)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    mainWindow = new();
+                    mainWindow.Show();
+                });
+                return;
+            }
+
+            mainWindow = new();
+
+            App app = new(_messenger)
+            {
+                ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown
+            };
             app.Run(mainWindow);
         });
         
