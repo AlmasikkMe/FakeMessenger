@@ -16,7 +16,8 @@
 
         <ListBox Grid.Row="1" x:Name="MessagesListBox" 
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 HorizontalContentAlignment="Stretch">
+                 HorizontalContentAlignment="Stretch"
+                 SelectionMode="Extended">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border Background="Transparent">

@@ -1,3 +1,4 @@
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -70,25 +71,25 @@ public partial class ChatPage : Page
 
     private void MessageCopy_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem menuItem)
+        StringBuilder sb = new();
+        foreach (Message message in MessagesListBox.SelectedItems)
+            sb.AppendLine(message.Text);
+
+        try
         {
-            if (menuItem.DataContext is Message currentMessage)
-            {
-                Clipboard.SetText(currentMessage.Text); 
-            }
+            Clipboard.SetText(sb.ToString());
         }
+        catch (System.Runtime.InteropServices.COMException)
+        {
+            MessageBox.Show("Не удалось получить доступ к буферу обмена. Попробуйте еще раз.");
+        }
+
     }
 
     private void MessageDelete_Click(object sender, RoutedEventArgs e)
     {
-        
-        if (sender is MenuItem menuItem)
-        {
-            if (menuItem.DataContext is Message currentMessage)
-            {
-                _chat.DeleteMessage(currentMessage);
-                RefreshMessages();
-            }
-        }
+        foreach (Message message in MessagesListBox.SelectedItems)
+            _chat.DeleteMessage(message);
+        RefreshMessages();
     }
 }
