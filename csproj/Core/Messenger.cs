@@ -2,51 +2,14 @@
 
 namespace FakeMessenger.Core;
 
-public class Messenger(Repository fileRepository, User? user = null)
+public class Messenger(FileRepository.FileRepository fileRepository, User? user = null)
 {
-    private Repository _fileRepository = fileRepository;
+    private FileRepository.FileRepository _fileRepository = fileRepository;
     public User User => _user;
     private User _user = user ?? new("@FakeChat", "Вы");
-    public IReadOnlyList<User> Contacts => _contacts.AsReadOnly();
-    private List<User> _contacts = [];
+    public ICollectionRepository<User> ContactsRopository { get; private set; }
     public IReadOnlyList<Chat> Chats => _chats.AsReadOnly();
     private List<Chat> _chats = [];
-
-    public void NewContact(string username, string firstName, string lastName = "")
-    {
-        if (username.IsWhiteSpace()) username = $"@user{_contacts.Count + 1}";
-        if (firstName.IsWhiteSpace()) firstName = $"Контакт {_contacts.Count + 1}";
-
-        if (!username.StartsWith("@")) username = $"@{username}";
-
-        if (_contacts.Any(contact => contact.Username == username))
-            throw new ArgumentException($"Пользователь с именем {username} уже существует!");
-
-        _contacts.Add(new(username, firstName, lastName));
-    }
-
-    public void NewContact(User user)
-    {
-        if (!user.Username.StartsWith("@")) user.Username = $"@{user.Username}";
-        if (_contacts.Any(contact => contact.Username == user.Username))
-            throw new ArgumentException($"Пользователь с именем {user.Username} уже существует!");
-
-        _contacts.Add(user);
-    }
-
-    public void RemoveContact(User contact)
-    {
-        if (!_contacts.Contains(contact)) throw new ArgumentException($"Контакт {contact.Username} не найден");
-
-        char[] chars = Enumerable.Range('0', 10)
-                                 .Concat(Enumerable.Range('a', 26))
-                                 .Concat(Enumerable.Range('A', 26))
-                                 .Select(c => (char)c)
-                                 .ToArray();
-        contact.Username = new string(Random.Shared.GetItems(chars, 16));
-
-        contact.IsDeleted = true;
-    }
 
     public void NewGroup(string chatName, string groupName, List<User> members)
     {
@@ -65,7 +28,7 @@ public class Messenger(Repository fileRepository, User? user = null)
         if (members.Count == 1)
             throw new ArgumentException("Требуется как минимум 1 участник группы");
 
-        if (members.Union(_contacts).GroupBy(member => member.Username).Any(g => g.Count() > 1))
+        if (members.Union(ContactsRopository.Get()).GroupBy(member => member.Username).Any(g => g.Count() > 1))
             throw new ArgumentException("Обнаружены разные объекты с одинаковым UserName!");
 
         if (groupName.IsWhiteSpace())
@@ -91,16 +54,6 @@ public class Messenger(Repository fileRepository, User? user = null)
                 select chat)
                 .ToList();
     }
-
-    [Obsolete("Используйте свойство Contacts для получения всех контактов.")]
-    public List<User> GetContacts() => Contacts.ToList();
-    public List<User> GetContacts(string search)
-    {
-        return (from contact in _contacts
-                where contact.Username.Contains(search.Trim(), StringComparison.OrdinalIgnoreCase)
-                select contact)
-                .ToList();
-    }
     public void AddChat(Chat chat)
     {
         if (_chats.Select(chat => chat.ChatName).Contains(chat.ChatName))
@@ -123,7 +76,7 @@ public class Messenger(Repository fileRepository, User? user = null)
         Messenger messenger = _fileRepository.Load();
 
         _user = messenger.User;
-        _contacts = messenger.Contacts.ToList();
+        this.ContactsRopository.Load(messenger.ContactsRopository);
         _chats = messenger.Chats.ToList();
     }
 }

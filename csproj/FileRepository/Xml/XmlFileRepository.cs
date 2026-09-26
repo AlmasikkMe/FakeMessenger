@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace FakeMessenger.FileRepository.Xml;
 
-public class XmlFileRepository(XmlSerializer serializer) : Repository
+public class XmlFileRepository(XmlSerializer serializer) : FileRepository
 {
     private XmlSerializer Serializer { get; set; } = serializer;
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];

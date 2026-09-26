@@ -80,7 +80,7 @@ public class ConsoleUI : IUserInterface
             { "Создать группу", NewGroup },
             { "Перейти в чат", () => ChatCommandMenu(ChooseChat()) },
             { "Удалить чат", () => _messenger.RemoveChat(ChooseChat("Выберите чат для удаления")) },
-            { "Удалить контакт", () => _messenger.RemoveContact(ChooseContact("Выберите контакт для удаления")) },
+            { "Удалить контакт", () => _messenger.ContactsRopository.Remove(ChooseContact("Выберите контакт для удаления")) },
             { "Сохранить",  Save },
             { "Загрузить", Load },
             { "Создать чат с контактом", CreateContactChat },
@@ -170,7 +170,7 @@ public class ConsoleUI : IUserInterface
         string? lastName = Console.ReadLine();
         if (lastName == ExitCommand) return;
 
-        _messenger.NewContact(username ?? "", firstName ?? "", lastName ?? "");
+        _messenger.ContactsRopository.Add(new(username ?? "", firstName ?? "", lastName ?? ""));
     }
 
     public void NewGroup()
@@ -183,7 +183,7 @@ public class ConsoleUI : IUserInterface
             User contact = ChooseContact("Добавьте члена группы", members);
             members.Add(contact);
 
-            if (_messenger.Contacts.Count == members.Count) isChooseMembers = false;
+            if (_messenger.ContactsRopository.Get().Count == members.Count) isChooseMembers = false;
 
             bool isYNDialog = true;
             while (isChooseMembers && isYNDialog)
@@ -233,12 +233,13 @@ public class ConsoleUI : IUserInterface
 
         if (username == _messenger.User.Username) return _messenger.User;
 
-        return _messenger.Contacts.First(u => u.Username == username);
+        return _messenger.ContactsRopository.Get().First(u => u.Username == username);
     }
 
     private User ChooseContact(string message = "Выберите контакт", List<User>? excludedUsers = null)
     {
-        return ChooseUser(_messenger.Contacts
+        return ChooseUser(_messenger.ContactsRopository
+                                    .Get()
                                     .Except(excludedUsers ?? [])
                                     .ToList());
     }
@@ -291,7 +292,8 @@ public class ConsoleUI : IUserInterface
 
     public void CreateContactChat()
     {
-        User contact = ChooseContact(excludedUsers: _messenger.Contacts
+        User contact = ChooseContact(excludedUsers: _messenger.ContactsRopository
+                                                              .Get()
                                                               .Where(u => _messenger.Chats.Any(c => c.ChatName == u.Username))
                                                               .ToList());
 

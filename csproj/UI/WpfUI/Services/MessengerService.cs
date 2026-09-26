@@ -20,12 +20,12 @@ internal sealed class MessengerService : IAppService
     private void UpdateData()
     {
         Chats = new ObservableCollection<Chat>(_messenger.Chats);
-        Contacts = new ObservableCollection<User>(_messenger.Contacts);
+        Contacts = new ObservableCollection<User>(_messenger.ContactsRopository.Get());
     }
 
     public void CreateContact(string username, string firstName, string lastName)
     {
-        _messenger.NewContact(username, firstName, lastName);
+        _messenger.ContactsRopository.Add(new(username, firstName, lastName));
         UpdateData();
     }
     public void CreateGroup(string chatName, string groupName, List<User> members)
@@ -51,7 +51,7 @@ internal sealed class MessengerService : IAppService
     }
     public void RemoveContact(User contact)
     {
-        _messenger.RemoveContact(contact);
+        _messenger.ContactsRopository.Remove(contact);
         UpdateData();
     }
     public void Save()

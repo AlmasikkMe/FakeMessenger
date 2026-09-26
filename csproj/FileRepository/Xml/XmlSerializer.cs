@@ -8,7 +8,7 @@ public class XmlSerializer
     public XDocument SerializeMessenger(Messenger messenger) =>
         new(new XElement("_messenger",
             SerializeUser(messenger.User),
-            new XElement("Contacts", from u in messenger.Contacts select SerializeUser(u)),
+            new XElement("Contacts", from u in messenger.ContactsRopository.Get() select SerializeUser(u)),
             new XElement("Chats", from c in messenger.Chats select SerializeChat(c))
             ));
 
@@ -46,7 +46,7 @@ public class XmlSerializer
         xElement.Element(name)?.Value ??
         throw DeserializeFailed(name, location);
 
-    public Messenger DeserializeMessenger(XDocument doc, Repository fileRepository, IEnumerable<string> locations)
+    public Messenger DeserializeMessenger(XDocument doc, FileRepository fileRepository, IEnumerable<string> locations)
     {
         User user;
         List<User> contacts;
@@ -69,7 +69,7 @@ public class XmlSerializer
 
         Messenger messenger = new(fileRepository, user);
 
-        contacts.ForEach(messenger.NewContact);
+        contacts.ForEach(messenger.ContactsRopository.Add);
         chats.ForEach(messenger.AddChat);
 
         return messenger;
