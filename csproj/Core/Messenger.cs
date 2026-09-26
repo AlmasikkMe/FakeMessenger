@@ -56,6 +56,9 @@ public class Messenger(Repository fileRepository, User? user = null)
         if (chatName.IsWhiteSpace())
             chatName = $"@chat{_chats.Count + 1}";
 
+        if (chatName[0] is not '@')
+            chatName = $"@{chatName}";
+
         if (_chats.Any(chat => chat.ChatName == chatName))
             throw new ArgumentException("Чат с таким уникальным именем уже существует!");
 
