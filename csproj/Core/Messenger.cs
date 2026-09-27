@@ -2,14 +2,16 @@
 
 namespace FakeMessenger.Core;
 
-public class Messenger(FileRepository.FileRepository fileRepository, User? user = null)
+public class Messenger(FileRepository.FileRepository fileRepos,
+                       ICollectionRepository<User> contactsRepos,
+                       User? user = null)
 {
-    private FileRepository.FileRepository _fileRepository = fileRepository;
     public User User => _user;
     private User _user = user ?? new("@FakeChat", "Вы");
-    public ICollectionRepository<User> ContactsRopository { get; private set; }
+    public ICollectionRepository<User> ContactsRopository { get; } = contactsRepos;
     public IReadOnlyList<Chat> Chats => _chats.AsReadOnly();
     private List<Chat> _chats = [];
+    private FileRepository.FileRepository _fileRepository { get; } = fileRepos;
 
     public void NewGroup(string chatName, string groupName, List<User> members)
     {
