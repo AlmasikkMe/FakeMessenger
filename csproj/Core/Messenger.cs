@@ -9,6 +9,6 @@ public class Messenger(FileRepository.FileRepository fileRepos,
 {
     public User User { get; } = user ?? new("@FakeChat", "Вы");
     public ICollectionRepository<User> ContactsRopository { get; } = contactsRepos;
-    public ICollectionRepository<Chat> ChatRopository { get; } = chatRepos;
+    public ICollectionRepository<Chat> ChatsRepository { get; } = chatRepos;
     public FileRepository.FileRepository FileRepository { get; } = fileRepos;
 }

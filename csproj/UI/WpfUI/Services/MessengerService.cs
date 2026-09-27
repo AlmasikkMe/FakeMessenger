@@ -16,10 +16,10 @@ internal sealed class MessengerService : IAppService
     {
         _messenger = messenger;
 
-        Chats = new(messenger.ChatRopository.Get());
-        messenger.ChatRopository.CollectionChanged += (s, e) => 
+        Chats = new(messenger.ChatsRepository.Get());
+        messenger.ChatsRepository.CollectionChanged += (s, e) => 
         {
-            UpdateObservableCollection(Chats, e, () => Chats = new(messenger.ChatRopository.Get()));
+            UpdateObservableCollection(Chats, e, () => Chats = new(messenger.ChatsRepository.Get()));
         };
 
         Contacts = new(messenger.ContactsRopository.Get());
@@ -66,13 +66,13 @@ internal sealed class MessengerService : IAppService
         Chat group = new(chatName, groupName);
         group.AddMembers(members);
 
-        _messenger.ChatRopository.Add(group);
+        _messenger.ChatsRepository.Add(group);
     }
     public void CreatePersonalChat(User contact)
     {
         Chat chat = new(contact.Username, contact.FullName);
         chat.AddMembers([CurrentUser, contact]);
-        _messenger.ChatRopository.Add(chat);
+        _messenger.ChatsRepository.Add(chat);
     }
     public void SendMessage(User sender, Chat chat, string text, string type = "text", DateTime? dateTime = null)
     {
@@ -80,7 +80,7 @@ internal sealed class MessengerService : IAppService
     }
     public void RemoveChat(Chat chat)
     {
-        _messenger.ChatRopository.Remove(chat);
+        _messenger.ChatsRepository.Remove(chat);
     }
     public void RemoveContact(User contact)
     {

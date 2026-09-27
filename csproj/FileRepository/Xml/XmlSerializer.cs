@@ -9,7 +9,7 @@ public class XmlSerializer
         new(new XElement("_messenger",
             SerializeUser(messenger.User),
             new XElement("Contacts", from u in messenger.ContactsRopository.Get() select SerializeUser(u)),
-            new XElement("Chats", from c in messenger.ChatRopository.Get() select SerializeChat(c))
+            new XElement("Chats", from c in messenger.ChatsRepository.Get() select SerializeChat(c))
             ));
 
     public XElement SerializeUser(User user) =>
@@ -70,15 +70,15 @@ public class XmlSerializer
         messenger = new(
             messenger.FileRepository,
             messenger.ContactsRopository,
-            messenger.ChatRopository,
+            messenger.ChatsRepository,
             user
         );
 
         messenger.ContactsRopository.Clear();
         contacts.ForEach(messenger.ContactsRopository.Add);
 
-        messenger.ChatRopository.Clear();
-        chats.ForEach(messenger.ChatRopository.Add);
+        messenger.ChatsRepository.Clear();
+        chats.ForEach(messenger.ChatsRepository.Add);
     }
 
     public User DeserializeUser(XElement xElement, IEnumerable<string> locations)
