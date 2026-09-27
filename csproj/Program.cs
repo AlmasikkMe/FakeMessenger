@@ -8,8 +8,10 @@ try
     XmlSerializer xmlSerializer = new();
 
     XmlFileRepository xmlFileRepository = new(xmlSerializer);
+    UsersRepository usersRepository = new();
+    ChatsRepository chatsRepository = new();
 
-    Messenger messenger = new(xmlFileRepository);
+    Messenger messenger = new(xmlFileRepository, usersRepository, chatsRepository);
 
     IUserInterface userInterface = new ConsoleUI(messenger);
 

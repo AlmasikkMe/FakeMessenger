@@ -79,7 +79,7 @@ public class ConsoleUI : IUserInterface
             { "Создать контакт", NewContact },
             { "Создать группу", NewGroup },
             { "Перейти в чат", () => ChatCommandMenu(ChooseChat()) },
-            { "Удалить чат", () => _messenger.RemoveChat(ChooseChat("Выберите чат для удаления")) },
+            { "Удалить чат", () => _messenger.ChatRopository.Remove(ChooseChat("Выберите чат для удаления")) },
             { "Удалить контакт", () => _messenger.ContactsRopository.Remove(ChooseContact("Выберите контакт для удаления")) },
             { "Сохранить",  Save },
             { "Загрузить", Load },
@@ -210,17 +210,21 @@ public class ConsoleUI : IUserInterface
         if (groupName == ExitCommand) return;
         groupName ??= "";
 
-        _messenger.NewGroup(chatName, groupName, members);
+        Chat group = new(chatName, groupName);
+        group.AddMembers(members);
+
+        _messenger.ChatRopository.Add(group);
     }
 
     private Chat ChooseChat(string message = "Выберите чат", List<Chat>? excludedChats = null)
     {
-        List<string> chatsNames = _messenger.Chats
+        List<string> chatsNames = _messenger.ChatRopository
+                                            .Get()
                                             .Select(c => c.ChatName)
                                             .ToList();
 
         string chatName = new SearchDialog(chatsNames, message).Show();
-        return _messenger.Chats.First(c => c.ChatName == chatName);
+        return _messenger.ChatRopository.Get().First(c => c.ChatName == chatName);
     }
 
     private User ChooseUser(List<User> users, string message = "Выбурите контакт")
@@ -294,18 +298,18 @@ public class ConsoleUI : IUserInterface
     {
         User contact = ChooseContact(excludedUsers: _messenger.ContactsRopository
                                                               .Get()
-                                                              .Where(u => _messenger.Chats.Any(c => c.ChatName == u.Username))
+                                                              .Where(u => _messenger.ChatRopository.Get().Any(c => c.ChatName == u.Username))
                                                               .ToList());
 
         Chat chat = new(contact.Username, contact.FullName);
         chat.AddMembers([contact, _messenger.User]);
 
-        _messenger.AddChat(chat);
+        _messenger.ChatRopository.Add(chat);
     }
 
     public void Save()
     {
-        _messenger.Save();
+        _messenger.FileRepository.Save(_messenger);
         Console.WriteLine($"Сохранено в xml файл");
 
         Console.ReadKey(true);
@@ -313,7 +317,7 @@ public class ConsoleUI : IUserInterface
 
     public void Load()
     {
-        _messenger.Load();
+        _messenger.FileRepository.Load(ref _messenger);
         Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);

@@ -7,6 +7,6 @@ namespace FakeMessenger.FileRepository
     {
         abstract public FileInfo SaveFile { get; set; }
         abstract public void Save(Messenger messenger);
-        abstract public Messenger Load();
+        abstract public void Load(ref Messenger messenger);
     }
 }

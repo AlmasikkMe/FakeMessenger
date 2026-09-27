@@ -8,5 +8,5 @@ public interface ICollectionRepository<T>
     IReadOnlyList<T> Get();
     void Add(T element);
     void Remove(T element);
-    void Load(ICollectionRepository<T> repository);
+    void Clear();
 }

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using FakeMessenger.Core;
 
 namespace FakeMessenger.UI.WpfUI.Services;
@@ -14,31 +15,64 @@ internal sealed class MessengerService : IAppService
     internal MessengerService(Messenger messenger)
     {
         _messenger = messenger;
-        UpdateData();
+
+        Chats = new(messenger.ChatRopository.Get());
+        messenger.ChatRopository.CollectionChanged += (s, e) => 
+        {
+            UpdateObservableCollection(Chats, e, () => Chats = new(messenger.ChatRopository.Get()));
+        };
+
+        Contacts = new(messenger.ContactsRopository.Get());
+        messenger.ContactsRopository.CollectionChanged += (s, e) => 
+        {
+            UpdateObservableCollection(Contacts, e, () => Contacts = new(messenger.ContactsRopository.Get()));
+        };
     }
 
-    private void UpdateData()
+    private void UpdateObservableCollection<T>(ObservableCollection<T> collection, 
+                                               NotifyCollectionChangedEventArgs eventArgs,
+                                               Action reset)
     {
-        Chats = new ObservableCollection<Chat>(_messenger.Chats);
-        Contacts = new ObservableCollection<User>(_messenger.ContactsRopository.Get());
+        switch (eventArgs.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                if (eventArgs.NewItems is null) break;
+                foreach (T item in eventArgs.NewItems)
+                {
+                    collection.Add(item);
+                };
+                break;
+
+            case NotifyCollectionChangedAction.Remove:
+                if (eventArgs.OldItems is null) break;
+                foreach (T item in eventArgs.OldItems)
+                {
+                    collection.Remove(item);
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Reset:
+                reset();
+                break;
+        }
     }
 
     public void CreateContact(string username, string firstName, string lastName)
     {
         _messenger.ContactsRopository.Add(new(username, firstName, lastName));
-        UpdateData();
     }
     public void CreateGroup(string chatName, string groupName, List<User> members)
     {
-        _messenger.NewGroup(chatName, groupName, members);
-        UpdateData();
+        Chat group = new(chatName, groupName);
+        group.AddMembers(members);
+
+        _messenger.ChatRopository.Add(group);
     }
     public void CreatePersonalChat(User contact)
     {
         Chat chat = new(contact.Username, contact.FullName);
         chat.AddMembers([CurrentUser, contact]);
-        _messenger.AddChat(chat);
-        UpdateData();
+        _messenger.ChatRopository.Add(chat);
     }
     public void SendMessage(User sender, Chat chat, string text, string type = "text", DateTime? dateTime = null)
     {
@@ -46,21 +80,18 @@ internal sealed class MessengerService : IAppService
     }
     public void RemoveChat(Chat chat)
     {
-        _messenger.RemoveChat(chat);
-        UpdateData();
+        _messenger.ChatRopository.Remove(chat);
     }
     public void RemoveContact(User contact)
     {
         _messenger.ContactsRopository.Remove(contact);
-        UpdateData();
     }
     public void Save()
     {
-        _messenger.Save();
+        _messenger.FileRepository.Save(_messenger);
     }
     public void Load()
     {
-        _messenger.Load();
-        UpdateData();
+        _messenger.FileRepository.Load(ref _messenger);
     }
 }

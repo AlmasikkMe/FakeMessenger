@@ -44,9 +44,9 @@ public class UsersRepository : ICollectionRepository<User>
         CollectionChanged?.Invoke(this, eventArgs);
     }
 
-    public void Load(ICollectionRepository<User> repository)
+    public void Clear()
     {
-        _users = repository.Get().ToList();
+        _users.Clear();
 
         NotifyCollectionChangedEventArgs eventArgs = new(
             NotifyCollectionChangedAction.Reset

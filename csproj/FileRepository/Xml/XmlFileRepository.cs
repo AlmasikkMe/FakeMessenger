@@ -10,11 +10,11 @@ public class XmlFileRepository(XmlSerializer serializer) : FileRepository
     public List<FileInfo> OldSaveFiles { get; set; } = [new("Save.Messager.xml")];
     override public FileInfo SaveFile { get; set; } = new("Messenger.Save.xml");
     override public void Save(Messenger messenger) => Serializer.SerializeMessenger(messenger).Save(SaveFile.FullName);
-    override public Messenger Load()
+    override public void Load(ref Messenger messenger)
     {
         if (!SaveFile.Exists) RenameOldFile();
 
-        return Serializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), this, [SaveFile.FullName]);
+        Serializer.DeserializeMessenger(XDocument.Load(SaveFile.FullName), ref messenger, [SaveFile.FullName]);
     }
     public void RenameOldFile()
     {
