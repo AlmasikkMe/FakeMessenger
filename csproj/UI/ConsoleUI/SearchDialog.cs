@@ -1,7 +1,7 @@
 ﻿namespace FakeMessenger.UI.ConsoleUI;
 public class SearchDialog
 {
-    private List<string[]> _options;
+    private List<string[]> _sortedOptions;
 
     private int _selectIndex = -1;
     private int _offset = 0;
@@ -19,12 +19,12 @@ public class SearchDialog
             else field = value.Trim();
         }
     }
-    public List<string> Options { get; set { field = value; UpdateOptions(); } }
+    public List<string> Options { get; set { field = value; SortOptions(); } }
 
     public SearchDialog(List<string> options, string? message = null)
     {
         Options = options;
-        UpdateOptions();
+        SortOptions();
         Message = message;
     }
 
@@ -44,7 +44,7 @@ public class SearchDialog
 
             while (true)
             {
-                if (_options.Count is 0 && Options.Count is 0) throw new ArgumentException("Нет списка для выбора");
+                if (_sortedOptions.Count is 0 && Options.Count is 0) throw new ArgumentException("Нет списка для выбора");
 
                 WriteSelected();
 
@@ -57,7 +57,7 @@ public class SearchDialog
                         {
                             int cursorTop = Message is null ? 1 : 2;
 
-                            foreach (var option in _options.Take(_selectIndex))
+                            foreach (var option in _sortedOptions.Take(_selectIndex))
                             {
                                 cursorTop += option.Length;
                             }
@@ -66,7 +66,7 @@ public class SearchDialog
 
                             Console.SetCursorPosition(0, cursorTop);
 
-                            foreach (var line in _options[_selectIndex])
+                            foreach (var line in _sortedOptions[_selectIndex])
                             {
                                 Console.WriteLine(line);
                             }
@@ -77,7 +77,7 @@ public class SearchDialog
                             {
                                 int lines = Message is null ? 1 : 2;
 
-                                foreach (var option in _options.Take(_selectIndex + 1))
+                                foreach (var option in _sortedOptions.Take(_selectIndex + 1))
                                 {
                                     lines += option.Length;
                                 }
@@ -91,7 +91,7 @@ public class SearchDialog
                         break;
 
                     case ConsoleKey.DownArrow:
-                        if (_selectIndex < _options.Count - 1)
+                        if (_selectIndex < _sortedOptions.Count - 1)
                         {
                             if (_selectIndex == -1)
                             {
@@ -101,7 +101,7 @@ public class SearchDialog
                             {
                                 int cursorTop = Message is null ? 1 : 2;
 
-                                foreach (var option in _options.Take(_selectIndex))
+                                foreach (var option in _sortedOptions.Take(_selectIndex))
                                 {
                                     cursorTop += option.Length;
                                 }
@@ -110,7 +110,7 @@ public class SearchDialog
 
                                 Console.SetCursorPosition(0, cursorTop);
 
-                                foreach (var line in _options[_selectIndex])
+                                foreach (var line in _sortedOptions[_selectIndex])
                                 {
                                     Console.WriteLine(line);
                                 }
@@ -120,7 +120,7 @@ public class SearchDialog
 
                             int lines = Message is null ? 1 : 2;
 
-                            foreach (var option in _options.Take(_selectIndex + 1))
+                            foreach (var option in _sortedOptions.Take(_selectIndex + 1))
                             {
                                 lines += option.Length;
                             }
@@ -150,7 +150,7 @@ public class SearchDialog
 
                             if (input == null) Console.WriteLine();
                             _searchText = input ?? string.Empty;
-                            UpdateOptions();
+                            SortOptions();
 
                             WriteOptionsLines();
 
@@ -195,7 +195,7 @@ public class SearchDialog
         {
             cursorTop++;
 
-            foreach (var option in _options.Take(_selectIndex))
+            foreach (var option in _sortedOptions.Take(_selectIndex))
             {
                 cursorTop += option.Length;
             }
@@ -209,7 +209,7 @@ public class SearchDialog
 
         if (_selectIndex != -1)
         {
-            foreach (var line in _options[_selectIndex])
+            foreach (var line in _sortedOptions[_selectIndex])
             {
                 Console.WriteLine(line);
             }
@@ -223,7 +223,7 @@ public class SearchDialog
     {
         int skipped = 0;
 
-        _options.ToList()
+        _sortedOptions.ToList()
                 .ForEach(option => 
                 {
                     foreach (var line in option)
@@ -240,9 +240,10 @@ public class SearchDialog
                 });
     }
 
-    private void UpdateOptions()
+    [System.Diagnostics.CodeAnalysis.MemberNotNull(nameof(_sortedOptions))]
+    private void SortOptions()
     {
-        _options = Options.Where(option => option.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+        _sortedOptions = Options.Where(option => option.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
                           .Select(SplitOption)
                           .ToList();
 
