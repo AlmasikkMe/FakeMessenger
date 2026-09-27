@@ -2,7 +2,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using FakeMessenger.Core;
+using FakeMessenger.Core.Entities;
 
 namespace FakeMessenger.UI.WpfUI.Pages;
 

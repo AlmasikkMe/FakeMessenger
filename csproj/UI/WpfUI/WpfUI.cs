@@ -1,4 +1,4 @@
-using FakeMessenger.Core;
+using FakeMessenger.Services;
 
 namespace FakeMessenger.UI.WpfUI;
 

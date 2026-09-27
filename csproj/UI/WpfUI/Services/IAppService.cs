@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using FakeMessenger.Core;
+using FakeMessenger.Core.Entities;
 
 namespace FakeMessenger.UI.WpfUI.Services;
 

@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using FakeMessenger.Core;
+using FakeMessenger.Services;
+using FakeMessenger.Core.Entities;
+
 
 namespace FakeMessenger.UI.WpfUI.Services;
 

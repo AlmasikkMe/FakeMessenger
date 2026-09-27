@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
+using FakeMessenger.Core.Entities;
 
-namespace FakeMessenger.Core;
+namespace FakeMessenger.Core.Repositories;
 
 public class ChatsRepository : ICollectionRepository<Chat>
 {

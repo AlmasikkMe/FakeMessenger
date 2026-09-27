@@ -1,4 +1,5 @@
-﻿using FakeMessenger.Core;
+﻿using FakeMessenger.Services;
+using FakeMessenger.Core.Entities;
 using System.Text;
 
 namespace FakeMessenger.UI.ConsoleUI;

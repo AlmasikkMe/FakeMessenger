@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace FakeMessenger.Core;
+namespace FakeMessenger.Core.Entities;
 
 public class Chat
 {

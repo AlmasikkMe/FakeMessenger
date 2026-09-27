@@ -1,4 +1,4 @@
-﻿namespace FakeMessenger.Core;
+﻿namespace FakeMessenger.Core.Entities;
 
 public class Message(User sender)
 {

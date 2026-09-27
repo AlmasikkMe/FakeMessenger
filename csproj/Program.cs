@@ -1,4 +1,5 @@
-﻿using FakeMessenger.Core;
+﻿using FakeMessenger.Services;
+using FakeMessenger.Core.Repositories;
 using FakeMessenger.FileRepository.Xml;
 using FakeMessenger.UI.ConsoleUI;
 using FakeMessenger.UI;

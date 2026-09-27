@@ -1,6 +1,6 @@
 using System.Windows;
 using FakeMessenger.UI.WpfUI.Services;
-using FakeMessenger.Core;
+using FakeMessenger.Services;
 
 namespace FakeMessenger.UI.WpfUI;
 

@@ -1,6 +1,7 @@
-﻿using FakeMessenger.FileRepository;
+﻿using FakeMessenger.Core.Entities;
+using FakeMessenger.Core.Repositories;
 
-namespace FakeMessenger.Core;
+namespace FakeMessenger.Services;
 
 public class Messenger(FileRepository.FileRepository fileRepos,
                        ICollectionRepository<User> contactsRepos,

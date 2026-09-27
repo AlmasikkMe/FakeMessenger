@@ -1,6 +1,6 @@
 using System.Collections.Specialized;
 
-namespace FakeMessenger.Core;
+namespace FakeMessenger.Core.Repositories;
 
 public interface ICollectionRepository<T>
 {
