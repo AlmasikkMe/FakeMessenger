@@ -11,7 +11,7 @@ public class Messenger(FileRepository.FileRepository fileRepos,
     public ICollectionRepository<User> ContactsRopository { get; } = contactsRepos;
     public IReadOnlyList<Chat> Chats => _chats.AsReadOnly();
     private List<Chat> _chats = [];
-    private FileRepository.FileRepository _fileRepository { get; } = fileRepos;
+    public FileRepository.FileRepository FileRepository { get; } = fileRepos;
 
     public void NewGroup(string chatName, string groupName, List<User> members)
     {
@@ -70,12 +70,12 @@ public class Messenger(FileRepository.FileRepository fileRepos,
 
     public void Save()
     {
-        _fileRepository.Save(this);
+        FileRepository.Save(this);
     }
 
     public void Load()
     {
-        Messenger messenger = _fileRepository.Load();
+        Messenger messenger = FileRepository.Load();
 
         _user = messenger.User;
         this.ContactsRopository.Load(messenger.ContactsRopository);
