@@ -32,9 +32,9 @@ internal sealed class MessengerService : IAppService
         };
     }
 
-    private void UpdateObservableCollection<T>(IReadOnlyList<T> source,
-                                               ObservableCollection<T> collection, 
-                                               NotifyCollectionChangedEventArgs e)
+    public static void UpdateObservableCollection<T>(IReadOnlyList<T> source,
+                                                     ObservableCollection<T> collection, 
+                                                     NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {

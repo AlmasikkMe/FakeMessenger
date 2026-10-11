@@ -16,6 +16,7 @@
         </StackPanel>
 
         <ListBox Grid.Row="1" x:Name="MessagesListBox" 
+                 ItemsSource="{Binding Messages}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  HorizontalContentAlignment="Stretch"
                  SelectionMode="Extended">

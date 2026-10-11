@@ -1,42 +1,57 @@
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using FakeMessenger.Core.Entities;
+using FakeMessenger.UI.WpfUI.Services;
 
 namespace FakeMessenger.UI.WpfUI.Pages;
 
 public partial class ChatPage : Page
 {
+    public ObservableCollection<Message> Messages { get; set; }
     private readonly Chat _chat;
     private Message? _editing;
 
     public ChatPage(Chat chat)
     {
-        InitializeComponent();
-        
-        MessageDateTimePicker.Value = DateTime.Now;
         _chat = chat;
+        Messages = new(_chat.MessagesRepository.Get());
+
+        InitializeComponent();
+
+        DataContext = this;
+
+        MessageDateTimePicker.Value = DateTime.Now;
         MessageSenderComboBox.ItemsSource = chat.MembersRepository.Get().Select(u => u.FullName);
         MessageSenderComboBox.SelectedIndex = 0;
+
         Loaded += ChatPage_Loaded;
+        Unloaded += ChatPage_Unloaded;
     }
 
     private void ChatPage_Loaded(object sender, RoutedEventArgs e)
     {
         ChatTitleTextBlock.Text = _chat.Name;
-        RefreshMessages();
+
+        _chat.MessagesRepository.CollectionChanged -= MessagesRepository_CollectionChanged;
+        _chat.MessagesRepository.CollectionChanged += MessagesRepository_CollectionChanged;
     }
 
-    private void RefreshMessages()
+    private void ChatPage_Unloaded(object sender, RoutedEventArgs e)
     {
-        // Обновляем источник, чтобы подхватить новые сообщения
-        MessagesListBox.ItemsSource = null;
-        MessagesListBox.ItemsSource = _chat.MessagesRepository.Get();
-        if (MessagesListBox.Items.Count > 0)
-        {
-            MessagesListBox.ScrollIntoView(MessagesListBox.Items[MessagesListBox.Items.Count - 1]);
-        }
+        _chat.MessagesRepository.CollectionChanged -= MessagesRepository_CollectionChanged;
+    }
+
+    private void MessagesRepository_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+            MessengerService.UpdateObservableCollection(
+                _chat.MessagesRepository.Get(), Messages, e
+            )
+        );
     }
 
     private void Send_Click(object sender, RoutedEventArgs e)
@@ -75,7 +90,6 @@ public partial class ChatPage : Page
         }
 
         MessageTextBox.Clear();
-        RefreshMessages();
     }
 
     private void Back_Click(object sender, RoutedEventArgs e)
@@ -115,6 +129,5 @@ public partial class ChatPage : Page
     {
         foreach (Message message in MessagesListBox.SelectedItems)
             _chat.MessagesRepository.Remove(message);
-        RefreshMessages();
     }
 }
