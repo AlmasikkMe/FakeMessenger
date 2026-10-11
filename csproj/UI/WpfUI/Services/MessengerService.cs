@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using FakeMessenger.Services;
 using FakeMessenger.Core.Entities;
+using System.Windows;
 
 
 namespace FakeMessenger.UI.WpfUI.Services;
@@ -21,40 +22,35 @@ internal sealed class MessengerService : IAppService
         Chats = new(messenger.ChatsRepository.Get());
         messenger.ChatsRepository.CollectionChanged += (s, e) => 
         {
-            UpdateObservableCollection(Chats, e, () => Chats = new(messenger.ChatsRepository.Get()));
+            Application.Current.Dispatcher.Invoke(() => UpdateObservableCollection(messenger.ChatsRepository.Get(), Chats, e));
         };
 
         Contacts = new(messenger.ContactsRopository.Get());
         messenger.ContactsRopository.CollectionChanged += (s, e) => 
         {
-            UpdateObservableCollection(Contacts, e, () => Contacts = new(messenger.ContactsRopository.Get()));
+            Application.Current.Dispatcher.Invoke(() => UpdateObservableCollection(messenger.ContactsRopository.Get(), Contacts, e));
         };
     }
 
-    private void UpdateObservableCollection<T>(ObservableCollection<T> collection, 
-                                               NotifyCollectionChangedEventArgs eventArgs,
-                                               Action reset)
+    private void UpdateObservableCollection<T>(IReadOnlyList<T> source,
+                                               ObservableCollection<T> collection, 
+                                               NotifyCollectionChangedEventArgs e)
     {
-        switch (eventArgs.Action)
+        switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                if (eventArgs.NewItems is null) break;
-                foreach (T item in eventArgs.NewItems)
-                {
-                    collection.Add(item);
-                };
+                if (e.NewItems is null) break;
+                foreach (T item in e.NewItems) collection.Add(item);
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-                if (eventArgs.OldItems is null) break;
-                foreach (T item in eventArgs.OldItems)
-                {
-                    collection.Remove(item);
-                }
+                if (e.OldItems is null) break;
+                foreach (T item in e.OldItems) collection.Remove(item);
                 break;
 
             case NotifyCollectionChangedAction.Reset:
-                reset();
+                collection.Clear();
+                foreach (T i in source) collection.Add(i);
                 break;
         }
     }
