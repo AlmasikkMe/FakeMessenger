@@ -114,7 +114,7 @@ public class ConsoleUI : IUserInterface
         Dictionary<string, Action> menuActions = new()
         {
             { "Посмотреть выбранное сообщение", () => { Console.WriteLine(MessageToString(message)); } },
-            { "Удалить сообщение", () => { chat.DeleteMessage(message); _isInMenu = false; } },
+            { "Удалить сообщение", () => { chat.MessagesRepository.Remove(message); _isInMenu = false; } },
         };
 
         ShowMenu(prompt, menuActions, "Вернуться в чат");
@@ -124,7 +124,7 @@ public class ConsoleUI : IUserInterface
     {
         Dictionary<string, Message> messages = [];
 
-        foreach (var message in chat.Messages)
+        foreach (var message in chat.MessagesRepository.Get())
         {  
             messages.Add(MessageToString(message), message);
         }
@@ -212,7 +212,7 @@ public class ConsoleUI : IUserInterface
         groupName ??= "";
 
         Chat group = new(chatName, groupName);
-        group.AddMembers(members);
+        foreach (User member in members) group.MembersRepository.Add(member);
 
         _messenger.ChatsRepository.Add(group);
     }
@@ -254,7 +254,7 @@ public class ConsoleUI : IUserInterface
         string? userInput;
         Console.WriteLine("Введите / на любом из следующих этапов для выхода");
 
-        sender ??= ChooseUser(chat.Members.Where(u => !u.IsDeleted).ToList(), "Выберете отправителя");
+        sender ??= ChooseUser(chat.MembersRepository.Get().Where(u => !u.IsDeleted).ToList(), "Выберете отправителя");
 
         while (string.IsNullOrWhiteSpace(text))
         {
@@ -280,7 +280,13 @@ public class ConsoleUI : IUserInterface
             if (dateTime == DateTime.MinValue) dateTime = DateTime.Now;
         }
 
-        chat.AddMessage(sender, text, type, dateTime);
+        Message message = new(sender) {
+            Text = text,
+            Type = type, 
+            DateTime = dateTime ?? DateTime.Now
+        };
+
+        chat.MessagesRepository.Add(message);
     }
 
     [Obsolete("Используйте SendMessage(chat, type: \"text\")")]
@@ -303,7 +309,8 @@ public class ConsoleUI : IUserInterface
                                                               .ToList());
 
         Chat chat = new(contact.Username, contact.FullName);
-        chat.AddMembers([contact, _messenger.User]);
+        chat.MembersRepository.Add(contact);
+        chat.MembersRepository.Add(_messenger.User);
 
         _messenger.ChatsRepository.Add(chat);
     }
