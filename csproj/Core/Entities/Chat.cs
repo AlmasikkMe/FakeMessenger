@@ -1,18 +1,10 @@
 ﻿using System.Data;
+using FakeMessenger.Core.Repositories;
 
 namespace FakeMessenger.Core.Entities;
 
 public class Chat
 {
-    public Chat(string chatName, string name)
-    {
-        ChatName = chatName;
-        Name = name;
-
-        _members = [];
-        _messages = [];
-    }
-
     public string ChatName
     {
         get;
@@ -34,12 +26,23 @@ public class Chat
         get;
         set => field = !value.IsWhiteSpace() ? value.Trim() : throw new ArgumentException("Название чата не может быть пустым");
     }
-    private List<User> _members;
-    private List<Message> _messages;
 
-    public IReadOnlyList<User> Members => _members.AsReadOnly();
-    public IReadOnlyList<Message> Messages => _messages.AsReadOnly();
+    public UsersRepository MembersRepository = new();
+    public MessagesRepository MessagesRepository = new();
 
+    [Obsolete("Используйте MembersRepository.Get()")]
+    public IReadOnlyList<User> Members => MembersRepository.Get();
+
+    [Obsolete("Используйте MessagesRepository.Get()")]
+    public IReadOnlyList<Message> Messages => MessagesRepository.Get();
+
+    public Chat(string chatName, string name)
+    {
+        ChatName = chatName;
+        Name = name;
+    }
+
+    [Obsolete("Используйте MembersRepository.Get()")]
     public List<User> GetMembers(string search = "")
     {
         return (from member in Members
@@ -48,23 +51,19 @@ public class Chat
                 .ToList();
     }
 
+    [Obsolete("Используйте MembersRepository.Add()")]
     public void AddMembers(List<User> members)
     {
-        _members.AddRange(members.Except(_members).ToList());
+        foreach (User member in members) MembersRepository.Add(member);
     }
 
+    [Obsolete("Используйте MessagesRepository.Add()")]
     public void AddMessage(Message message)
     {
-        if (_messages.Contains(message)) throw new ArgumentException("Это сообщение уже в чате.");
-
-        _messages.Add(message);
-
-        _messages = (from m in _messages
-                     orderby m.DateTime
-                     select m)
-                    .ToList();
+        MessagesRepository.Add(message);
     }
 
+    [Obsolete("Используйте MessagesRepository.Add()")]
     public void AddMessage(User sender, string? text = null, string? type = null, DateTime? dateTime = null)
     {
         Message message = new(sender);
@@ -73,11 +72,12 @@ public class Chat
         if (type != null) message.Type = type;
         if (dateTime != null) message.DateTime = (DateTime)dateTime;
 
-        AddMessage(message);
+        MessagesRepository.Add(message);
     }
 
+    [Obsolete("Используйте MessagesRepository.Remove()")]
     public void DeleteMessage(Message message)
     {
-        if (!_messages.Remove(message)) throw new ArgumentException($"Сообщение \"{message.Text}\" не найдено");
+        MessagesRepository.Remove(message);
     }
 }
