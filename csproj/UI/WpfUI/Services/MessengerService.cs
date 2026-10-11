@@ -62,19 +62,26 @@ internal sealed class MessengerService : IAppService
     public void CreateGroup(string chatName, string groupName, List<User> members)
     {
         Chat group = new(chatName, groupName);
-        group.AddMembers(members);
+        foreach (User member in members) group.MembersRepository.Add(member);
 
         _messenger.ChatsRepository.Add(group);
     }
     public void CreatePersonalChat(User contact)
     {
         Chat chat = new(contact.Username, contact.FullName);
-        chat.AddMembers([CurrentUser, contact]);
+        chat.MembersRepository.Add(CurrentUser);
+        chat.MembersRepository.Add(contact);
         _messenger.ChatsRepository.Add(chat);
     }
     public void SendMessage(User sender, Chat chat, string text, string type = "text", DateTime? dateTime = null)
     {
-        chat.AddMessage(sender, text, type, dateTime);
+        Message message = new(sender) {
+            Text = text,
+            Type = type,
+            DateTime = dateTime ?? DateTime.Now
+        };
+
+        chat.MessagesRepository.Add(message);
     }
     public void RemoveChat(Chat chat)
     {

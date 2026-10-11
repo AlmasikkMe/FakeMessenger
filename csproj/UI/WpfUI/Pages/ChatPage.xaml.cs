@@ -17,7 +17,7 @@ public partial class ChatPage : Page
         
         MessageDateTimePicker.Value = DateTime.Now;
         _chat = chat;
-        MessageSenderComboBox.ItemsSource = chat.Members.Select(u => u.FullName);
+        MessageSenderComboBox.ItemsSource = chat.MembersRepository.Get().Select(u => u.FullName);
         MessageSenderComboBox.SelectedIndex = 0;
         Loaded += ChatPage_Loaded;
     }
@@ -32,7 +32,7 @@ public partial class ChatPage : Page
     {
         // Обновляем источник, чтобы подхватить новые сообщения
         MessagesListBox.ItemsSource = null;
-        MessagesListBox.ItemsSource = _chat.Messages;
+        MessagesListBox.ItemsSource = _chat.MessagesRepository.Get();
         if (MessagesListBox.Items.Count > 0)
         {
             MessagesListBox.ScrollIntoView(MessagesListBox.Items[MessagesListBox.Items.Count - 1]);
@@ -55,7 +55,7 @@ public partial class ChatPage : Page
 
     private void SendMessage()
     {
-        User sender = _chat.Members.First(u => u.FullName == MessageSenderComboBox.SelectedItem.ToString());
+        User sender = _chat.MembersRepository.Get().First(u => u.FullName == MessageSenderComboBox.SelectedItem.ToString());
         string text = MessageTextBox.Text.Trim();
         if (text.IsWhiteSpace())
         {
@@ -114,7 +114,7 @@ public partial class ChatPage : Page
     private void MessageDelete_Click(object sender, RoutedEventArgs e)
     {
         foreach (Message message in MessagesListBox.SelectedItems)
-            _chat.DeleteMessage(message);
+            _chat.MessagesRepository.Remove(message);
         RefreshMessages();
     }
 }
