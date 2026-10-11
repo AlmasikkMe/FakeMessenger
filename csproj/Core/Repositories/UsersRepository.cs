@@ -1,58 +1,12 @@
-using System.Collections.Specialized;
 using FakeMessenger.Core.Entities;
 
 namespace FakeMessenger.Core.Repositories;
 
-public class UsersRepository : ICollectionRepository<User>
+public class UsersRepository : BaseCollectionRepository<User>
 {
-    public event NotifyCollectionChangedEventHandler? CollectionChanged = null;
-    private List<User> _users = [];
-
-    public IReadOnlyList<User> Get()
+    protected override void ThrowIfInvalid(User user)
     {
-        return _users.AsReadOnly();
-    }
-
-    public void Add(User user)
-    {
-        if (_users.Any(u => u.Username == user.Username)) 
+        if (_items.Any(u => u.Username == user.Username)) 
             throw new ArgumentException($"Пользователь с username {user.Username} уже существует в коллекции.");
-        
-        NotifyCollectionChangedEventArgs eventArgs = new(
-            NotifyCollectionChangedAction.Add, 
-            user,
-            _users.Count
-        );
-
-        _users.Add(user);
-
-        CollectionChanged?.Invoke(this, eventArgs);
-    }
-    
-    public void Remove(User user)
-    {
-        if (!_users.Contains(user)) 
-            throw new InvalidOperationException($"Указанный экземпляр пользователя {user.Username} не содержится в коллекции.");
-        
-        NotifyCollectionChangedEventArgs eventArgs = new(
-            NotifyCollectionChangedAction.Remove, 
-            user,
-            _users.IndexOf(user)
-        );
-
-        _users.Remove(user);
-
-        CollectionChanged?.Invoke(this, eventArgs);
-    }
-
-    public void Clear()
-    {
-        _users.Clear();
-
-        NotifyCollectionChangedEventArgs eventArgs = new(
-            NotifyCollectionChangedAction.Reset
-        );
-
-        CollectionChanged?.Invoke(this, eventArgs);
     }
 }
