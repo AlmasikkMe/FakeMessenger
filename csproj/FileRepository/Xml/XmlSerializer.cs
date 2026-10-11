@@ -25,8 +25,8 @@ public class XmlSerializer
         new("Chat",
             new XAttribute("ChatName", chat.ChatName),
             new XAttribute("Name", chat.Name),
-            new XElement("Members", from m in chat.Members select new XElement("User", m.Username)),
-            new XElement("Messages", from m in chat.Messages select SerializeMessage(m))
+            new XElement("Members", from m in chat.MembersRepository.Get() select new XElement("User", m.Username)),
+            new XElement("Messages", from m in chat.MessagesRepository.Get() select SerializeMessage(m))
             );
 
     public XElement SerializeMessage(Message message) =>
@@ -113,18 +113,21 @@ public class XmlSerializer
                                                       .Select(member => member.Value)
                                                       .ToList();
 
-        chat.AddMembers(
-            membersUsernames
-            .Select(username =>
-                users.FirstOrDefault(user => user.Username == username) ??
-                    throw new InvalidOperationException($"Пользователь {username} из элемента Members {chatName} не найден")
-                )
-            .ToList());
+        IEnumerable<User> members = membersUsernames.Select(username =>
+            users.FirstOrDefault(user => user.Username == username) ??
+                throw new InvalidOperationException($"Пользователь {username} из элемента Members {chatName} не найден")
+            );
+
+        foreach (User member in members)
+        {
+            chat.MembersRepository.Add(member);
+        } 
+            
 
         XElement? messagesElement = xElement.Element("Messages");
         messagesElement?.Elements("Message")
                         .ToList()
-                        .ForEach(el => chat.AddMessage(DeserializeMessage(el, chat.Members, locations.Append("Messages"))));
+                        .ForEach(el => chat.MessagesRepository.Add(DeserializeMessage(el, chat.MembersRepository.Get(), locations.Append("Messages"))));
 
         return chat;
     }
