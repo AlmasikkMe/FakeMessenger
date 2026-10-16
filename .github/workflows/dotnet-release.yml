@@ -1,0 +1,124 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Версия (тег, например v1.2.3)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Что нового (кратко)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Pre-release?'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Узнаём предыдущий тег (для ссылки compare)
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # нужно, чтобы были все теги
+
+      - name: Get previous tag
+        id: prev_tag
+        run: |
+          # Берём последний тег, который НЕ равен вводимой версии
+          PREV_TAG=$(git tag --sort=-creatordate | grep -v "^${{ inputs.version }}$" | head -n 1)
+          if [ -z "$PREV_TAG" ]; then
+            echo "⚠️ Предыдущий тег не найден — compare-ссылка будет от первого коммита"
+            PREV_TAG=""
+          fi
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          echo "Previous tag: $PREV_TAG"
+
+      # 2. Ищем последний успешный run dotnet-desktop.yml
+      - name: Get last successful run
+        id: last_run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID=$(gh run list \
+            --repo ${{ github.repository }} \
+            --workflow dotnet-desktop.yml \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')
+          if [ -z "$RUN_ID" ]; then
+            echo "❌ Не найден успешный запуск dotnet-desktop.yml"
+            exit 1
+          fi
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "Last successful run ID: $RUN_ID"
+
+      # 3. Скачиваем артефакты
+      - name: Download artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh run download ${{ steps.last_run.outputs.run_id }} \
+            --repo ${{ github.repository }} \
+            --dir artifacts
+          find artifacts -type f -exec ls -lh {} \;
+
+      # 4. Собираем все файлы в одну папку
+      - name: Flatten artifacts
+        run: |
+          mkdir release-files
+          find artifacts -type f -exec cp {} release-files/ \;
+          ls -lh release-files
+
+      # 5. Формируем тело релиза
+      - name: Build release body
+        id: body
+        env:
+          PREV_TAG: ${{ steps.prev_tag.outputs.prev_tag }}
+          VERSION: ${{ inputs.version }}
+          NOTES: ${{ inputs.release_notes }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -n "$PREV_TAG" ]; then
+            COMPARE_URL="https://github.com/${REPO}/compare/${PREV_TAG}...${VERSION}"
+          else
+            COMPARE_URL="https://github.com/${REPO}/releases"
+          fi
+
+          {
+            echo "**Что нового**"
+            echo ""
+            echo "${NOTES}"
+            echo ""
+            echo "---"
+            echo ""
+            echo "**Полный Changelog**"
+            echo "${COMPARE_URL}"
+          } > release_body.md
+
+          echo "----- release_body.md -----"
+          cat release_body.md
+
+      # 6. Создаём релиз
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          name: ${{ inputs.version }}
+          body_path: release_body.md
+          prerelease: ${{ inputs.prerelease }}
+          files: release-files/*
+          draft: false
+          generate_release_notes: false   # у нас своё тело
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
