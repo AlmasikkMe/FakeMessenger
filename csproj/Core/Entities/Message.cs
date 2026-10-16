@@ -1,9 +1,45 @@
-﻿namespace FakeMessenger.Core.Entities;
+﻿using System.ComponentModel;
 
-public class Message(User sender)
+namespace FakeMessenger.Core.Entities;
+
+public class Message(User sender) : INotifyPropertyChanged
 {
-    public User Sender { get; set; } = sender;
-    public string Text { get; set; } = "";
-    public string Type { get; set; } = "text";
-    public DateTime DateTime { get; set; } = DateTime.Now;
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public User Sender 
+    { 
+        get; 
+        set 
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new(nameof(Sender))); 
+        }
+    } = sender;
+    public string Text 
+    {
+        get;
+        set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new(nameof(Text)));
+        }
+    } = "";
+    public string Type
+    {
+        get;
+        set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new(nameof(Type)));
+        }
+    } = "text";
+    public DateTime DateTime 
+    { 
+        get; 
+        set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new(nameof(DateTime)));
+        } 
+    } = DateTime.Now;
 }
