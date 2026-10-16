@@ -40,7 +40,7 @@ internal sealed class MessengerService : IAppService
         {
             case NotifyCollectionChangedAction.Add:
                 if (e.NewItems is null) break;
-                foreach (T item in e.NewItems) collection.Add(item);
+                foreach (T item in e.NewItems) collection.Insert(e.NewStartingIndex, item);
                 break;
 
             case NotifyCollectionChangedAction.Remove:

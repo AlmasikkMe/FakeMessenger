@@ -26,7 +26,7 @@ public abstract class BaseCollectionRepository<T> : ICollectionRepository<T>
 
         _items.Add(item);
 
-        CollectionChanged?.Invoke(this, eventArgs);
+        CollectionChangedInvoke(eventArgs);
     }
     
     public void Remove(T chat)
@@ -41,7 +41,7 @@ public abstract class BaseCollectionRepository<T> : ICollectionRepository<T>
 
         _items.RemoveAt(index);
 
-        CollectionChanged?.Invoke(this, eventArgs);
+        CollectionChangedInvoke(eventArgs);
     }
 
     public void Clear()
@@ -52,6 +52,11 @@ public abstract class BaseCollectionRepository<T> : ICollectionRepository<T>
             NotifyCollectionChangedAction.Reset
         );
 
+        CollectionChangedInvoke(eventArgs);
+    }
+
+    protected void CollectionChangedInvoke(NotifyCollectionChangedEventArgs eventArgs)
+    {
         CollectionChanged?.Invoke(this, eventArgs);
     }
 }
