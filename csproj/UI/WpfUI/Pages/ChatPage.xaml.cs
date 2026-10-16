@@ -127,7 +127,9 @@ public partial class ChatPage : Page
 
     private void MessageDelete_Click(object sender, RoutedEventArgs e)
     {
-        foreach (Message message in MessagesListBox.SelectedItems)
+        List<Message> selected = MessagesListBox.SelectedItems.Cast<Message>().ToList();
+
+        foreach (Message message in selected)
             _chat.MessagesRepository.Remove(message);
     }
 }
