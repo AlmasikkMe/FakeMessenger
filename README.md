@@ -2,13 +2,13 @@
   <h1>FakeMessenger</h1>
   <p>Приложение на C#, имитирующее работу мессенджера</p>
   
-  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#">
-  <img src="https://img.shields.io/badge/.NET_10-5C2D91?style=for-the-badge&logo=.net&logoColor=white" alt=".NET 10">
-  <img src="https://img.shields.io/badge/WPF-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="WPF">
-  <img src="https://img.shields.io/badge/Console-4D4D4D?style=for-the-badge&logo=windows-terminal&logoColor=white" alt="Console">
+  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge" alt="C#">
+  <img src="https://img.shields.io/badge/.NET_10-5C2D91?style=for-the-badge" alt=".NET 10">
+  <img src="https://img.shields.io/badge/WPF-0078D4?style=for-the-badge" alt="WPF">
+  <img src="https://img.shields.io/badge/Console-4D4D4D?style=for-the-badge" alt="Console">
   <br>
-  <img src="https://img.shields.io/badge/Platform-Windows%20%2F%20Linux-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Platform">
-  <img src="https://img.shields.io/badge/Storage-XML-orange?style=for-the-badge&logo=xml&logoColor=white" alt="XML">
+  <img src="https://img.shields.io/badge/Platform-Windows%20%2F%20Linux-0078D4?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Storage-XML-orange?style=for-the-badge" alt="XML">
 </div>
 
 <br>
