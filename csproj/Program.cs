@@ -2,7 +2,11 @@
 using FakeMessenger.Core.Repositories;
 using FakeMessenger.FileRepository.Xml;
 using FakeMessenger.UI.ConsoleUI;
+using FakeMessenger.UI.AvaloniaUI;
 using FakeMessenger.UI;
+#if WINDOWS
+using FakeMessenger.UI.WpfUI;
+#endif
 
 try
 {
@@ -14,7 +18,7 @@ try
 
     Messenger messenger = new(xmlFileRepository, usersRepository, chatsRepository);
 
-    IUserInterface userInterface = new ConsoleUI(messenger);
+    IUserInterface userInterface = new FakeMessenger.UI.AvaloniaUI.AvaloniaUI(messenger);
 
     userInterface.Run();
 }
