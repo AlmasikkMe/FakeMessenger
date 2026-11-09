@@ -6,6 +6,8 @@ namespace FakeMessenger.UI.AvaloniaUI;
 
 public partial class App : Application
 {
+    public MainWindow? MainWindow { get; set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
