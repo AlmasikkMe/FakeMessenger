@@ -1,14 +1,17 @@
 ﻿using Avalonia;
 using FakeMessenger.Services;
+using FakeMessenger.UI.AvaloniaUI.Services;
 
 namespace FakeMessenger.UI.AvaloniaUI;
 
 public class AvaloniaUI : IUserInterface
 {
-    private Messenger _messenger;
+    private Messenger _messenger;     
+    public static IAppService AppService { get; set; }
 
     public AvaloniaUI(Messenger messenger)
     {
+        AppService = new MessengerService(messenger);
         _messenger = messenger;
     }
 
