@@ -3,6 +3,50 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="FakeMessenger.UI.AvaloniaUI.Pages.ChatSelectionPage">
-  Welcome to Avalonia from Page!
+             x:Class="FakeMessenger.UI.AvaloniaUI.Pages.ChatSelectionPage"
+             xmlns:entities="clr-namespace:FakeMessenger.Core.Entities;assembly=FakeMessenger">
+  <Grid Margin="5">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Text="Мои чаты"
+               FontSize="24" FontWeight="Bold"
+               Margin="0,0,0,10" />
+
+    <ListBox Grid.Row="1" x:Name="ChatsListBox"
+             DoubleTapped="ChatsListView_DoubleTapped">
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+      </ListBox.Styles>
+
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="entities:Chat">
+          <StackPanel>
+            <FlyoutBase.AttachedFlyout>
+              <MenuFlyout>
+                <MenuItem Header="Удалить" Click="ChatDelete_Click" />
+              </MenuFlyout>
+            </FlyoutBase.AttachedFlyout>
+
+            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding ChatName}" Foreground="Gray" FontSize="12" />
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <StackPanel Grid.Row="2" 
+                Orientation="Horizontal" HorizontalAlignment="Right"
+                Margin="0,0,0,0">
+      <Button Content="Создать чат" Click="CreateChat_Click" Margin="5,5,0,0" Padding="10,5" />
+      <Button Content="Создать контакт" Click="CreateContact_Click" Margin="5,5,0,0" Padding="10,5" />
+      <Button Content="Сохранить данные" Click="Save_Click" Margin="5,5,0,0" Padding="10,5" />
+      <Button Content="Загрузить данные" Click="Load_Click" Margin="5,5,0,0" Padding="10,5" />
+    </StackPanel>
+  </Grid>
 </ContentPage>

@@ -11,7 +11,7 @@ public partial class MainWindow : Window
         MainFrame.Content = new ChatSelectionPage();
     }
 
-    public void NavigateTo(Page page)
+    public void NavigateTo(object? sender, Page page)
     {
         MainFrame.Content = page;
     }

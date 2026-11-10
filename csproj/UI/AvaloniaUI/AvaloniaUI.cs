@@ -6,20 +6,18 @@ namespace FakeMessenger.UI.AvaloniaUI;
 
 public class AvaloniaUI : IUserInterface
 {
-    private Messenger _messenger;     
-    public static IAppService AppService { get; set; }
+    private IAppService AppService;     
+    private NavigationService NavigationService;
 
     public AvaloniaUI(Messenger messenger)
     {
         AppService = new MessengerService(messenger);
-        _messenger = messenger;
+        NavigationService = new();
     }
 
-    public void Run() => Run(isJoin: true);
-
-    public void Run(bool isJoin)
+    public void Run()
     {
-        AppBuilder app = AppBuilder.Configure<App>()
+        AppBuilder appBuilder = AppBuilder.Configure<App>(() => new App(AppService, NavigationService))
                                    .UsePlatformDetect()
 #if DEBUG
                                    .WithDeveloperTools()
@@ -27,6 +25,6 @@ public class AvaloniaUI : IUserInterface
                                    .WithInterFont()
                                    .LogToTrace();
 
-        app.StartWithClassicDesktopLifetime([]);
+        appBuilder.StartWithClassicDesktopLifetime([]);
     }
 }
