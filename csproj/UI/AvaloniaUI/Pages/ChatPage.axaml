@@ -1,0 +1,70 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FakeMessenger.UI.AvaloniaUI.Pages.ChatPage"
+             xmlns:entities="clr-namespace:FakeMessenger.Core.Entities;assembly=FakeMessenger">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+      <Button Content="← Назад" Click="Back_Click" Margin="0,0,15,0" Padding="10,5" />
+      <TextBlock x:Name="ChatTitleTextBlock" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" />
+    </StackPanel>
+
+    <ListBox Grid.Row="1" x:Name="MessagesListBox"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             SelectionMode="Multiple">
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+          </Style>
+        </ListBox.Styles>
+        <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="entities:Message">
+                <Border Background="Transparent">
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Копировать" Click="MessageCopy_Click" />
+                            <MenuItem Header="Изменить" Click="MessageEdit_Click" />
+                            <MenuItem Header="Удалить" Click="MessageDelete_Click" />
+                        </ContextMenu>
+                    </Border.ContextMenu>
+
+                    <Border Margin="2" Padding="8"
+                            CornerRadius="5" Background="#F0F0F0"
+                            HorizontalAlignment="Left">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Sender.FullName}" FontWeight="SemiBold" Foreground="#333" />
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                            <TextBlock Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
+                                    FontSize="10" Foreground="Gray" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </Border>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+
+    <Grid Grid.Row="2" Margin="0,10,0,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="MessageTextBox" Padding="5" FontSize="14" KeyDown="MessageTextBox_KeyDown" />
+        <ComboBox Grid.Column="1" x:Name="MessageSenderComboBox" Margin="10,0,0,0" Padding="5" />
+        <!-- <xctk:DateTimePicker x:Name="MessageDateTimePicker" Grid.Column="2" Margin="10,0,0,0"
+                              Format="Custom" FormatString="d.MM.yyyy H:mm:ss"
+                              TimeFormat="Custom" TimeFormatString="H:mm:ss" 
+                              ShowButtonSpinner="False" /> -->
+        <Button Grid.Column="3" Content="Отправить" Click="Send_Click" Margin="10,0,0,0" Padding="15,5" />
+    </Grid>
+  </Grid>
+</ContentPage>

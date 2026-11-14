@@ -9,4 +9,6 @@ public class NavigationService
     {
         Navigation?.Invoke(sender, page);
     }
+    public void GoBack() { throw new NotImplementedException(); }
 }
+    
