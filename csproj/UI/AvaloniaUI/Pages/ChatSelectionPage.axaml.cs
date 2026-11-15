@@ -23,18 +23,18 @@ public partial class ChatSelectionPage : ContentPage
     {
         if (ChatsListBox.SelectedItem is Chat selectedChat)
         {
-            // _navigationService?.NavigateTo(new ChatPage(selectedChat));
+            _navigationService?.NavigateTo(new ChatPage(selectedChat));
         }
     }
 
     private void CreateChat_Click(object sender, RoutedEventArgs e)
     {
-        // _navigationService?.NavigateTo(new CreateChatPage());
+        _navigationService?.NavigateTo(new CreateChatPage());
     }
 
     private void CreateContact_Click(object sender, RoutedEventArgs e)
     {
-        // _navigationService?.NavigateTo(new CreateContactPage());
+        _navigationService?.NavigateTo(new CreateContactPage());
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
@@ -57,7 +57,7 @@ public partial class ChatSelectionPage : ContentPage
         {
             if (menuItem.DataContext is Chat currentChat)
             {
-                _appService.RemoveChat(currentChat);
+                _appService?.RemoveChat(currentChat);
             }
         }
     }

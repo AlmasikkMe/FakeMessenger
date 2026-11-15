@@ -35,7 +35,6 @@ public partial class App : Application
         {
             MainWindow window = new();
             desktop.MainWindow = window;
-            NavigationService.Navigation += window.NavigateTo; 
         }
 
         base.OnFrameworkInitializationCompleted();
