@@ -88,6 +88,7 @@ public class ConsoleUI : IUserInterface
 #if WINDOWS
             { "Перейти в WpfUI-режим",  OpenWpf}
 #endif
+            { "Перейти в AvaloniaUI-режим",  OpenWpf}
         };
 
         ShowMenu(message, menuActions, "Выйти без сохранения");
@@ -329,6 +330,16 @@ public class ConsoleUI : IUserInterface
         Console.WriteLine("Загружено из xml файла");
 
         Console.ReadKey(true);
+    }
+
+    public void OpenWpf()
+    {
+        AvaloniaUI.AvaloniaUI avaloniaUI = new(_messenger);
+        avaloniaUI.Run();
+        Console.WriteLine("Окно с интерфейсом открыто");
+        Console.WriteLine("Во избежание закрытия окна с интерфейсом не закрывайте окно консоли");
+        Console.WriteLine("Вы можете продолжать использовать это окно");
+        Console.Read();
     }
 
 #if WINDOWS
