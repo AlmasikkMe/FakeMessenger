@@ -16,6 +16,7 @@ public class NavigationService
     }
     public void GoBack(object? sender = null)
     {
+        CurrentPage = LastPage;
         if (LastPage is not null)
             Navigation?.Invoke(sender, LastPage);
     }
