@@ -86,9 +86,9 @@ public class ConsoleUI : IUserInterface
             { "Загрузить", Load },
             { "Создать чат с контактом", CreateContactChat },
 #if WINDOWS
-            { "Перейти в WpfUI-режим",  OpenWpf}
+            { "Перейти в WpfUI-режим",  OpenWpf },
 #endif
-            { "Перейти в AvaloniaUI-режим",  OpenWpf}
+            { "Перейти в AvaloniaUI-режим",  OpenAvalonia}
         };
 
         ShowMenu(message, menuActions, "Выйти без сохранения");
@@ -332,7 +332,7 @@ public class ConsoleUI : IUserInterface
         Console.ReadKey(true);
     }
 
-    public void OpenWpf()
+    public void OpenAvalonia()
     {
         AvaloniaUI.AvaloniaUI avaloniaUI = new(_messenger);
         avaloniaUI.Run();
