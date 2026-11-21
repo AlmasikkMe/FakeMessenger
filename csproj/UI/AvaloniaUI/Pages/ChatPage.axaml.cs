@@ -17,11 +17,14 @@ public partial class ChatPage : ContentPage
     private readonly Chat _chat;
     private Message? _editing;
     private IAppService? _appService;
-    private NavigationService? _navigationService;
+    private INavigation? _navigation;
 
     public ChatPage()
     {
         InitializeComponent();
+        
+        _navigation = (Application.Current as App)?.Navigation;
+        _appService = (Application.Current as App)?.AppService;
 
         DataContext = this;
 
@@ -102,7 +105,7 @@ public partial class ChatPage : ContentPage
 
     private void Back_Click(object sender, RoutedEventArgs e)
     {
-        _navigationService.GoBack();
+        _navigation?.PopAsync();
     }
 
     private void MessageCopy_Click(object sender, RoutedEventArgs e)

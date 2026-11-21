@@ -1,4 +1,6 @@
 ﻿using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Controls;
 using FakeMessenger.Services;
 using FakeMessenger.UI.AvaloniaUI.Services;
 
@@ -6,18 +8,22 @@ namespace FakeMessenger.UI.AvaloniaUI;
 
 public class AvaloniaUI : IUserInterface
 {
-    private IAppService AppService;     
-    private NavigationService NavigationService;
+    IAppService _appService;
+    INavigation _navigation;
 
     public AvaloniaUI(Messenger messenger)
     {
-        AppService = new MessengerService(messenger);
-        NavigationService = new();
+        _appService = new MessengerService(messenger);
+        _navigation = new NavigationPage()
+        {
+            PageTransition = new PageSlide(TimeSpan.FromMilliseconds(100), PageSlide.SlideAxis.Horizontal)
+        };
     }
 
     public void Run()
     {
-        AppBuilder appBuilder = AppBuilder.Configure<App>(() => new App(AppService, NavigationService))
+        AppBuilder appBuilder = AppBuilder
+                                   .Configure(() => new App(_appService, _navigation))
                                    .UsePlatformDetect()
 #if DEBUG
                                    .WithDeveloperTools()

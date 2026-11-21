@@ -6,5 +6,11 @@
 
     <Application.Styles>
         <FluentTheme />
+        
+        <!-- Скрывает панель навигации у всех ContentPage внутри NavigationPage -->
+        <Style Selector="NavigationPage ContentPage">
+            <Setter Property="NavigationPage.HasNavigationBar" Value="False" />
+            <Setter Property="NavigationPage.HasBackButton" Value="False" />
+        </Style>
     </Application.Styles>
 </Application>

@@ -6,15 +6,11 @@ namespace FakeMessenger.UI.AvaloniaUI;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(INavigation? navigation = null)
     {
         InitializeComponent();
-        (Application.Current as App)?.NavigationService?.Navigation += NavigateTo; 
-        (Application.Current as App)?.NavigationService?.NavigateTo(new ChatSelectionPage());
-    }
-
-    public void NavigateTo(object? sender, Page page)
-    {
-        MainFrame.Content = page;
+        navigation ??= new NavigationPage();
+        Content = navigation;
+        navigation.PushAsync(new ChatSelectionPage());  
     }
 }

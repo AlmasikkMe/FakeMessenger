@@ -9,14 +9,14 @@ namespace FakeMessenger.UI.AvaloniaUI;
 public partial class CreateChatPage : ContentPage
 {
     private IAppService? _appService;
-    private NavigationService? _navigationService;
+    private INavigation? _navigation;
 
     public CreateChatPage()
     {
         InitializeComponent();
         Loaded += CreateChatPage_Loaded;
         
-        _navigationService = (Application.Current as App)?.NavigationService;
+        _navigation = (Application.Current as App)?.Navigation;
         _appService = (Application.Current as App)?.AppService;
     }
 
@@ -63,7 +63,7 @@ public partial class CreateChatPage : ContentPage
         try
         {
             _appService?.CreatePersonalChat(contact);
-            _navigationService?.GoBack();
+            _navigation?.PopAsync();
         }
         catch (Exception ex)
         {            
@@ -81,7 +81,7 @@ public partial class CreateChatPage : ContentPage
         try
         {
             _appService?.CreateGroup(chatName, groupName, members);
-            _navigationService?.GoBack();
+            _navigation?.PopAsync();
         }
         catch (Exception ex)
         {
@@ -91,6 +91,6 @@ public partial class CreateChatPage : ContentPage
 
     private void Back_Click(object sender, RoutedEventArgs e)
     {
-        _navigationService?.GoBack();
+        _navigation?.PopAsync();
     }
 }

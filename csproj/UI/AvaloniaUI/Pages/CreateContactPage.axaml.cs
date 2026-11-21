@@ -8,12 +8,12 @@ namespace FakeMessenger.UI.AvaloniaUI;
 public partial class CreateContactPage : ContentPage
 {
     private IAppService? _appService;
-    private NavigationService? _navigationService;
+    private INavigation? _navigation;
 
     public CreateContactPage()
     {
         InitializeComponent();
-        _navigationService = (Application.Current as App)?.NavigationService;
+        _navigation = (Application.Current as App)?.Navigation;
         _appService = (Application.Current as App)?.AppService;
     }
 
@@ -26,7 +26,7 @@ public partial class CreateContactPage : ContentPage
         try
         {
             _appService?.CreateContact(username, firstName, lastName);
-            _navigationService?.GoBack();
+            _navigation?.PopAsync();
         }
         catch (System.Exception ex)
         {
@@ -36,6 +36,6 @@ public partial class CreateContactPage : ContentPage
 
     private void Back_Click(object sender, RoutedEventArgs e)
     {
-        _navigationService?.GoBack();
+        _navigation?.PopAsync();
     }
 }

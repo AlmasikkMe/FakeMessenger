@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using FakeMessenger.Services;
@@ -10,18 +11,18 @@ public partial class App : Application
 {
     public MainWindow? MainWindow { get; set; }
     public IAppService? AppService { get; private set; }
-    public NavigationService? NavigationService { get; private set; }
+    public INavigation? Navigation { get; private set; }
 
     public App()
     {
         AppService = null;
-        NavigationService = null;
+        Navigation = null;
     }
 
-    public App(IAppService appService, NavigationService navigationService)
+    public App(IAppService appService, INavigation navigationService)
     {
         AppService = appService;
-        NavigationService = navigationService;
+        Navigation = navigationService;
     }
 
     public override void Initialize()
@@ -33,7 +34,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            MainWindow window = new();
+            MainWindow window = new(Navigation);
             desktop.MainWindow = window;
         }
 

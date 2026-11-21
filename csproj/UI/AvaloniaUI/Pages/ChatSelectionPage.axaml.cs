@@ -9,12 +9,12 @@ namespace FakeMessenger.UI.AvaloniaUI.Pages;
 public partial class ChatSelectionPage : ContentPage
 {
     private IAppService? _appService;
-    private NavigationService? _navigationService;
+    private INavigation? _navigation;
 
     public ChatSelectionPage()  
     {
         InitializeComponent();
-        _navigationService = (Application.Current as App)?.NavigationService;
+        _navigation = (Application.Current as App)?.Navigation;
         _appService = (Application.Current as App)?.AppService;
         ChatsListBox.ItemsSource = _appService?.Chats;
     }
@@ -23,18 +23,18 @@ public partial class ChatSelectionPage : ContentPage
     {
         if (ChatsListBox.SelectedItem is Chat selectedChat)
         {
-            _navigationService?.NavigateTo(new ChatPage(selectedChat));
+            _navigation?.PushAsync(new ChatPage(selectedChat));
         }
     }
 
     private void CreateChat_Click(object sender, RoutedEventArgs e)
     {
-        _navigationService?.NavigateTo(new CreateChatPage());
+        _navigation?.PushAsync(new CreateChatPage());
     }
 
     private void CreateContact_Click(object sender, RoutedEventArgs e)
     {
-        _navigationService?.NavigateTo(new CreateContactPage());
+        _navigation?.PushAsync(new CreateContactPage());
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
