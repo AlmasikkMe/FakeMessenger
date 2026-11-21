@@ -11,12 +11,13 @@ public class Chat
         set
         {
             string chatName = value.Trim();
-            if (!chatName.StartsWith("@")) chatName = $"@{chatName}";
+            chatName = chatName.Replace("@", "$");
+            if (!chatName.StartsWith("$")) chatName = $"${chatName}";
 
             if (chatName.Skip(1).All(char.IsAsciiLetterOrDigit))
             {
                 if (chatName.Length - 1 is >= 5 and <= 20) field = chatName;
-                else throw new ArgumentException("Уникальное имя чата должно содержать от 5 до 20 символов (не считая @)");
+                else throw new ArgumentException("Уникальное имя чата должно содержать от 5 до 20 символов (не считая $)");
             }
             else throw new ArgumentException("Уникальное имя чата допускает только латинские символы или цифры");
         }
