@@ -19,28 +19,27 @@ public partial class ChatPage : ContentPage
     private IAppService? _appService;
     private INavigation? _navigation;
 
-    public ChatPage()
+
+    public ChatPage(Chat chat)
     {
-        InitializeComponent();
-        
         _navigation = (Application.Current as App)?.Navigation;
         _appService = (Application.Current as App)?.AppService;
 
-        DataContext = this;
-
         Loaded += ChatPage_Loaded;
         Unloaded += ChatPage_Unloaded;
-    }
 
-    public ChatPage(Chat chat) : this()
-    {
         _chat = chat;
         Messages = new(_chat.MessagesRepository.Get());
 
-        // Теперь MessageSenderComboBox уже инициализирован благодаря : this()
+        DataContext = this;
+
+        InitializeComponent();
+
         MessageSenderComboBox.ItemsSource = chat.MembersRepository.Get().Select(u => u.FullName);
         MessageSenderComboBox.SelectedIndex = 0;
     }
+
+    public ChatPage() : this(new Chat("@example", "chat")) { }
 
 
     private void ChatPage_Loaded(object? sender, RoutedEventArgs e)

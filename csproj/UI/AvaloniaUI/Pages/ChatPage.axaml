@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FakeMessenger.UI.AvaloniaUI.Pages.ChatPage"
-             xmlns:entities="clr-namespace:FakeMessenger.Core.Entities;assembly=FakeMessenger">
+             xmlns:entities="clr-namespace:FakeMessenger.Core.Entities;assembly=FakeMessenger"
+             xmlns:pages="clr-namespace:FakeMessenger.UI.AvaloniaUI.Pages"
+             x:DataType="pages:ChatPage">
   <Grid Margin="10">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -19,6 +21,7 @@
 
     <ListBox Grid.Row="1" x:Name="MessagesListBox"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             ItemsSource="{Binding Messages}" 
              SelectionMode="Multiple">
         <ListBox.Styles>
           <Style Selector="ListBoxItem">
